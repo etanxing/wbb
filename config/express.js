@@ -18,7 +18,8 @@ module.exports = function (app, config) {
         level: 9
     }))
 
-    app.use(express.static(config.root + '/public/'))
+    app.use('/admin', express.static(config.root + '/public/admin'));
+    app.use('/admin/post', express.static(config.root + '/public/admin'))
 
     // production only
     app.configure('production', function(){

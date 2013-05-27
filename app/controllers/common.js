@@ -17,7 +17,7 @@ exports.getall = function (req, res, next) {
     
     fs.readFile(path + '/public/admin/index.html', 'utf8', function(error, content) {
         if (error) console.log(error);
-        res.send(200, content);
+        res.send(200, content);        
     });
 }
 
