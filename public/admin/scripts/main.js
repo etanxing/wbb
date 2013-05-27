@@ -27,12 +27,17 @@ require.config({
         datetimepicker : {
             deps: ['jquery-ui'],
             exports: 'jquery'
+        },
+        tagsinput : {
+            deps: ['jquery'],
+            exports: 'jquery'
         }
     },
     paths: {
         jquery: '../bower_components/jquery/jquery',
         'jquery-ui' : '../bower_components/jquery-ui/ui/jquery-ui',
         datetimepicker : '../bower_components/jquery-timepicker-addon/jquery-ui-timepicker-addon',
+        tagsinput : '../bower_components/jQuery-Tags-Input/jquery.tagsinput',
         backbone: '../bower_components/backbone-amd/backbone',
         underscore: '../bower_components/underscore-amd/underscore',
         text: '../bower_components/requirejs-text/text',

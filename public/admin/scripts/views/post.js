@@ -7,7 +7,7 @@ define([
     'moment',
     '../models/post',
     'text!../templates/post.html',
-    '../common'
+    'tagsinput'
 ], function ($, _, Backbone, moment, Post, post) {
     'use strict';
 
@@ -38,6 +38,10 @@ define([
                 dateFormat: 'dd/mm/yy',
                 timeFormat: 'hh:mm TT'
             });
+
+            // Tags Input
+            this.$('.tagsinput').tagsInput();
+
         },
 
         unrender: function () {
