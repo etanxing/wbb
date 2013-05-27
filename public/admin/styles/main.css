@@ -1,0 +1,80 @@
+body {
+	background: #f4f4f4 url(http://i.imgur.com/Okzc1Bk.png);
+}
+
+#container {
+	position: relative;
+}
+
+.sidemenu {
+	position: absolute;
+	top:0;
+	width: 200px;
+}
+
+.login-view + .sidemenu {
+	display: none;
+}
+
+.login-view .login {
+	background: none;
+	color: #000000;
+	padding: 100px 38px;
+}
+
+.login-view .login-screen {
+	background-color: transparent;
+	width: 589px;
+	margin: 0 auto;
+	padding: 0;
+	position: relative;
+}
+
+.login-screen .login-icon {
+	left: 0;
+	top: 0;
+	width: 96px;
+}
+
+.login-form {
+	margin-left: 120px;
+}
+
+.login-form .login-field {
+	width: 409px;
+}
+
+.other-account a {
+	text-decoration: none;
+	width: 36px;
+	display: inline-block;
+	padding-right: 5px;
+	overflow: hidden;
+	transition: padding-right 200ms;
+}
+
+.other-account a span {
+	margin-left: 5px;
+	font-size: 1.5em;
+	vertical-align: 7px;
+}
+
+.other-account a:hover {
+	padding-right: 100px;
+}
+
+#container > div[class$=-view] {
+	margin-left: 200px;
+}
+
+#container div.login-view {
+	margin-left: 0;
+}
+
+
+
+@media (min-width: 1200px) {
+	.login-form .login-field {
+		width: 409px;
+	}
+}

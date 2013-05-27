@@ -1,0 +1,8 @@
+<h1>Dashboard</h1>
+<p>
+	<ul>
+		<% _.each(counters, function(counter) { %>
+		<li><%= counter.name %>: <%= counter.count %></li>
+		<% }) %>
+	</ul>
+</p>

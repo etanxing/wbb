@@ -1,0 +1,26 @@
+<article class="<%=(post.type === 1?'post':'') + (post.status === 1? ' publish' : '') %> ">
+    <header class="entry-header">
+        <h1 class="entry-title">
+            <%=post.title %>
+        </h1>
+    </header>
+    <div class="entry-content">
+        <p>
+            <%=post.content %>
+        </p>       
+    </div>
+    <footer class="entry-meta">
+        <% if (post.tags && post.tags.length > 0) { %>
+        tagged
+        <%=(_.map(post.tags, function(tag) { 
+            return '<a href="tag/' + tag + '" rel="tag">' + tag + '</a>'
+            })).join(',') %>
+        <% } %>
+        on
+        <a href="<%=post.title %>"
+        title="12:32 PM" rel="bookmark"><time class="entry-date" datetime="<%=post.modified_gmt%>">23/04/2013</time></a>
+        <span class="by-author">by
+            <span class="author"><%=post.author && post.author.name%></span>
+        </span>
+    </footer>
+</article>
