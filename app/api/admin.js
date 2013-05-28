@@ -103,6 +103,7 @@ exports.updatepost = function (req, res, next) {
         //Compare tags
         var removedTags = [],
             addedTags = [],
+            createdTags = [],
             newTags = tags.length?tags.split(','):[];
 
         post.tags.forEach(function (tag) {
@@ -123,40 +124,48 @@ exports.updatepost = function (req, res, next) {
 
         Step(
             function decreaseTags() {
+                if (removedTags.length === 0) return 1;
                 db.tags.update( { taxonomy : { $in : removedTags} }, { $inc : { count : -1 }}, { multi : true }, this);
             },
 
-            function increaseTags(err) {
-                var self = this;
+            function findExistingTags(err) {
                 if (err) return next(err);
-                if (addedTags.length === 0) return null;
-                db.tags.find( { taxonomy : { $in : addedTags } }, { taxonomy : 1, _id : 0 }, function(err, increasedTags){
-                    var createdTags = [],
-                        increasedTags = increasedTags.map(function (increasedTag) {
-                            return increasedTag.taxonomy;
-                        });
-
-                    addedTags.forEach(function (addTag) {
-                        increasedTags.indexOf(addTag) === -1 && createdTags.push(addTag)
-                    })
-
-                    db.tags.update( { taxonomy : { $in : increasedTags} }, { $inc : { count : 1 }}, { multi : true }, function (err) {
-                        if (err) return next(err);
-                        var reformed = createdTags.map(function (createdTag) {
-                            return {
-                                taxonomy : createdTag,
-                                slug     : createdTag.replace(/\s+|\s+$/g,'-'),
-                                count    : 1
-                            };
-                        });
-
-                        console.log('reformed : %s', JSON.stringify(reformed));
-                        db.tags.insert(reformed, self);
-                    });      
-                })
+                if (addedTags.length === 0) return 1;
+                db.tags.find( { taxonomy : { $in : addedTags } }, { taxonomy : 1, _id : 0 }, this);
             },
 
-            function updateTags(err) {
+            function increaseTags(err, existingTags) {  
+                if (existingTags === 1) return 1;
+                if (err) return next(err);
+                var existingTags = existingTags.map(function (existingTag) {
+                    return existingTag.taxonomy;
+                });
+
+                addedTags.forEach(function (addTag) {
+                    existingTags.indexOf(addTag) === -1 && createdTags.push(addTag)
+                })
+
+                db.tags.update( { taxonomy : { $in : existingTags} }, { $inc : { count : 1 }}, { multi : true }, this);
+            },
+
+            function insertTags(err, skip) {
+                if (skip === 1) return 1;
+                if (err) return next(err);
+                var reformed = createdTags.map(function (createdTag) {
+                    return {
+                        taxonomy : createdTag,
+                        slug     : createdTag.replace(/\s+|\s+$/g,'-'),
+                        count    : 1
+                    };
+                });
+
+                console.log('reformed : %s', JSON.stringify(reformed));
+
+                if (reformed.length === 0 ) return true;
+                db.tags.insert(reformed, this);
+            },
+
+            function updateTags(err, skip) {
                 if (err) return next(err);
                 db.posts.update({ _id : id }, { $set: { tags : newTags }}, this)
             },
@@ -169,15 +178,6 @@ exports.updatepost = function (req, res, next) {
 
         //console.log('updated. Post: %s', JSON.stringify(post));        
     });
-
-
-
-    // db.posts.update({ _id : id }, { $set : data }, function(err) {
-    //     // save completed
-    //     if (err) return next(err);
-    //     console.log('updated.')
-    //     res.json(200);
-    // });
 };
 
 //Add a Post
