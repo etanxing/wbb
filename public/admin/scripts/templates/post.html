@@ -1,39 +1,34 @@
-<h1><%=post.title.length>0? 'Edit':'Add New' %> Post</h1>
+<h1><%=isNew? 'Add New' : 'Edit' %> Post</h1>
 <form>
     <div class="row-fluid">
         <div class="span9 " >
-            <div class="controls">
-                <input type="text" placeholder="Enter title here" id="title" value="<%=post.title%>">
+            <div class="control-group">
+                <input type="text" placeholder="Enter title here" id="title">
             </div>
-            Permalink: <%=post.slug%>
-            <div class="controls">
-                <textarea rows="15" id="content"><%=post.content%></textarea>
+            <div class="control-group">
+                <input type="text" placeholder="Permalink" id="slug">
+            </div>
+            <div class="control-group">
+                <textarea rows="15" id="content"></textarea>
             </div>
         </div>
-        <div class="span3 secondary">
-            <div class="controls">
+        <div class="span3 secondary">            
+            <div class="control-group">
                 <label for="status">Publish</label>
-                <select id="status">
-                    <% _.each(status, function(option) {%>
-                    <option value="<%=option[0]%>" <%=option[0]===post.status?'selected':''%>><%=option[1]%></option>
-                    <% })%>
-                </select>
+                <select id="status"></select>
+                <a href="#" class="btn btn-large btn-block btn-primary" id="submit"><%=isNew? 'Publish' : 'Update'%></a>
             </div>
-            <div class="controls">
+            <div class="control-group">
                 <label for="date">Published on</label>
-                <input type="text" id="date" value='<%=moment(post.date).format("DD/MM/YYYY hh:mm A")%>'>
+                <input type="text" id="date">
             </div>
-            <div class="controls">
+            <div class="control-group">
                 <label for="type">Type</label>
-                <select id="type">
-                    <% _.each(type, function(type) {%>
-                    <option value="<%=type[0]%>" <%=type[0]===post.type?'selected':''%>><%=type[1]%></option>
-                    <% })%>
-                </select>
+                <select id="type"></select>
             </div>
-            <div class="controls">
+            <div class="control-group">
                 <label for="tags">Tags</label>
-                <input id="tags" class="tagsinput" value="<%=post.tags.join(',')%>" />
+                <input id="tags" class="tagsinput" />
             </div>
         </div>
 

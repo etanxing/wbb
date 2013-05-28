@@ -45,8 +45,11 @@ module.exports = function (app) {
     //Get Tags
     app.get('/admin/api/tags', admin.usercheck, admin.tags);
 
-    //Get items by name and medicaltype
-    app.get('/api/collection', admin.collection);
+    //Update a Post
+    app.put('/admin/api/post/:id', admin.usercheck, admin.updatepost);
+
+    //Add a Post
+    app.post('/admin/api/post', admin.usercheck, admin.addpost);
 
     //Update item's name by id
     app.put('/api/model', admin.model);

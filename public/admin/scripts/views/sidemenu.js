@@ -28,7 +28,7 @@ define([
         },
 
         navigate : function(e) {
-            Backbone.history.navigate('admin/posts', true);
+            Backbone.history.navigate('admin/' + e.target.title, true);
             return false;
         }
     });

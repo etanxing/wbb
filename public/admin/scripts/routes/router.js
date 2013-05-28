@@ -48,7 +48,7 @@ define([
             'admin/'          : 'index',
             'admin/dashboard' : 'dashboard',
             'admin/posts'     : 'posts',
-            'admin/post/:id'  : 'post', 
+            'admin/post(/:id)': 'post', 
             '*path'           : 'page404'
         },
 
@@ -76,7 +76,9 @@ define([
             this.view && this.view.unrender();
             this.view = this.views[viewname];
             $('#container')
-            .prepend(this.view.render(options).el);
+            .prepend(this.view.el);
+
+            this.view.render(options);
         }
     });
 

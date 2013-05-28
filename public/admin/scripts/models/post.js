@@ -10,18 +10,27 @@ define([
     var Post = Backbone.Model.extend({
         idAttribute: "_id",
 
-        schema: {
-            title    : 'Text',
-            slug     : 'Text',
-            status   : { type: 'Select', options: [ { val: 1, label: 'Published' }, 
-                                                    { val: 2, label: 'Draft' }, 
-                                                    { val: 3, label: 'Password' }]},
-            type     : { type: 'Select', options: [ { val: 1, label: 'Post' },
-                                                    { val: 2, label: 'Page' } ]},
-            date     : 'DateTime',
-            content  : 'TextArea',
-            password : 'Password',
-            tags     : 'Text'
+        defaults: {
+            'title'  : '',
+            'content': '',
+            'status' : 3,
+            'type'   : 1,
+            'date'   : new Date,
+            'tags'   : []
+        },
+
+        validate : function (attrs) {
+            var errors = [];
+
+            if (attrs.title.length > 10) {
+                errors.push({
+                    attr : 'title',
+                    err  : true,
+                    msg  : 'Title is too long'
+                });
+            }
+
+            //return errors;
         },
 
         urlRoot : function() {

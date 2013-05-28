@@ -3,7 +3,7 @@
 define([
     'datetimepicker',
     'underscore',
-    'backbone',
+    'Backbone.Stickit',
     'moment',
     '../models/post',
     'text!../templates/post.html',
@@ -14,38 +14,122 @@ define([
     var PostView = Backbone.View.extend({
         className : 'post-view',
 
+        events : {
+            'submit form'   : 'update',
+            'click #submit' : 'update'
+        },
+
+        bindings: {
+            '#title'  : 'title',
+            '#slug'   : 'slug',
+            '#date'   : {
+                observe: 'date',
+                onGet: function (date) {
+                    return moment(date).format("DD/MM/YYYY hh:mm A");
+                }
+            },
+            '#content': 'content',
+            '#status' : {
+                observe: 'status',
+                selectOptions:{
+                    collection:[{value: 1, label:'Published' }, 
+                                {value: 2, label:'Password' },
+                                {value: 3, label:'Draft'}]
+                }
+            },
+            '#type' : {
+                observe: 'type',
+                selectOptions:{
+                    collection:[{value: 1, label:'Post' }, 
+                                {value: 2, label:'Page' }]
+                }
+            },
+            '#tags' : {
+                observe: 'tags',
+                onGet: function (tags) {
+                    return tags.join(',');
+                },
+                onSet: function (tags) {
+                    return tags.split(',');
+                }
+            }
+        },
+
         initialize: function() {
             _.bindAll(this, 'renderPost');
         },
 
         render: function(id) {
-            var post = new Post();
-            post.set('_id', id);
+            this.model = new Post();            
+            this.listenTo(this.model, 'invalid', this.showErrors)
 
-            post.fetch({ success : this.renderPost });
+            if (id) {
+                this.model.set('_id', id);
+                this.model.fetch({ success : this.renderPost });
+            } else {
+                this.renderPost();
+            }
 
             return this;
         },
 
-        renderPost: function(model) {
+        renderPost: function() {
             this.$el.html(_.template(post)({
-                post   : model.toJSON(),
-                status : [[1, 'Published'], [2, 'Password'], [3, 'Draft']],
-                type   : [[1, 'Post'], [2, 'Page']]
+                isNew : this.model.isNew()
             }));
 
-            this.$('#date').datetimepicker({
-                dateFormat: 'dd/mm/yy',
-                timeFormat: 'hh:mm TT'
-            });
+            //Binding model and form input
+            this.stickit();
 
             // Tags Input
-            this.$('.tagsinput').tagsInput();
+            //this.$('.tagsinput').tagsInput();
 
+            this.$('#date').datetimepicker({
+                hourGrid: 6,
+                minuteGrid: 10,
+                dateFormat: 'dd/mm/yy',
+                timeFormat: 'hh:mm TT',
+                ampm: true
+            });
         },
 
         unrender: function () {
-            this.remove();
+            this.$('#date').datetimepicker('destroy');
+
+            //Unbinding model and form input
+            this.unstickit();
+            this.detach();
+        },
+
+        update : function (e) {
+            this.model.save({
+                // 'title'  : this.$('#title').val(),
+                // 'slug'   : this.$('#slug').val(),
+                // 'content': this.$('#content').val(),
+                // 'status' : this.$('#status').val(),
+                // 'date'   : this.$('#date').val(),
+                // 'type'   : this.$('#type').val(),
+                // 'tags'   : this.$('#tags').val(),
+            }, {
+                wait : true,
+                success : function () {
+                    alert('success');
+                },
+                error: function () {
+                    alert('failed to save');
+                }
+            })
+        },
+
+        showErrors : function (model, errors) {
+            var self = this;
+
+            this.$('.control-group').removeClass('error');
+
+            _.each(errors, function (error) {
+                self.$('#' + error.attr)
+                .parent('.control-group').addClass('error');
+            })
         }
     });
 
