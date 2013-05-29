@@ -90,6 +90,8 @@ exports.updatepost = function (req, res, next) {
     delete data._id;
     delete data.author;
     delete data.tags;
+    data.date = moment(data.date).format();
+    data.date_gmt = moment(data.date).utc().format();
     data.modified = now.format();
     data.modified_gmt = now.utc().format();
 
@@ -123,66 +125,124 @@ exports.updatepost = function (req, res, next) {
         */
 
         Step(
-            function decreaseTags() {
-                if (removedTags.length === 0) return 1;
-                db.tags.update( { taxonomy : { $in : removedTags} }, { $inc : { count : -1 }}, { multi : true }, this);
-            },
+        function decreaseTags() {
+            if (removedTags.length === 0) return 1;
+            db.tags.update( { taxonomy : { $in : removedTags} }, { $inc : { count : -1 }}, { multi : true }, this);
+        },
 
-            function findExistingTags(err) {
-                if (err) return next(err);
-                if (addedTags.length === 0) return 1;
-                db.tags.find( { taxonomy : { $in : addedTags } }, { taxonomy : 1, _id : 0 }, this);
-            },
+        function findExistingTags(err) {
+            if (err) return next(err);
+            if (addedTags.length === 0) return 1;
+            db.tags.find( { taxonomy : { $in : addedTags } }, { taxonomy : 1, _id : 0 }, this);
+        },
 
-            function increaseTags(err, existingTags) {  
-                if (existingTags === 1) return 1;
-                if (err) return next(err);
-                var existingTags = existingTags.map(function (existingTag) {
-                    return existingTag.taxonomy;
-                });
+        function increaseTags(err, existingTags) {  
+            if (existingTags === 1) return 1;
+            if (err) return next(err);
+            var existingTags = existingTags.map(function (existingTag) {
+                return existingTag.taxonomy;
+            });
 
-                addedTags.forEach(function (addTag) {
-                    existingTags.indexOf(addTag) === -1 && createdTags.push(addTag)
-                })
+            addedTags.forEach(function (addTag) {
+                existingTags.indexOf(addTag) === -1 && createdTags.push(addTag)
+            })
 
-                db.tags.update( { taxonomy : { $in : existingTags} }, { $inc : { count : 1 }}, { multi : true }, this);
-            },
+            db.tags.update( { taxonomy : { $in : existingTags} }, { $inc : { count : 1 }}, { multi : true }, this);
+        },
 
-            function insertTags(err, skip) {
-                if (skip === 1) return 1;
-                if (err) return next(err);
-                var reformed = createdTags.map(function (createdTag) {
-                    return {
-                        taxonomy : createdTag,
-                        slug     : createdTag.replace(/\s+|\s+$/g,'-'),
-                        count    : 1
-                    };
-                });
+        function insertTags(err, skip) {
+            if (skip === 1) return 1;
+            if (err) return next(err);
+            var reformed = createdTags.map(function (createdTag) {
+                return {
+                    taxonomy : createdTag,
+                    slug     : createdTag.replace(/\s+|\s+$/g,'-'),
+                    count    : 1
+                };
+            });
 
-                console.log('reformed : %s', JSON.stringify(reformed));
+            console.log('reformed : %s', JSON.stringify(reformed));
 
-                if (reformed.length === 0 ) return true;
-                db.tags.insert(reformed, this);
-            },
+            if (reformed.length === 0 ) return true;
+            db.tags.insert(reformed, this);
+        },
 
-            function updateTags(err, skip) {
-                if (err) return next(err);
-                db.posts.update({ _id : id }, { $set: { tags : newTags }}, this)
-            },
+        function updateTags(err, skip) {
+            if (err) return next(err);
+            db.posts.update({ _id : id }, { $set: { tags : newTags }}, this)
+        },
 
-            function complete(err) {
-                if (err) return next(err);
-                res.json(200);
-            }
+        function complete(err) {
+            if (err) return next(err);
+            res.json(200);
+        }
         )
 
-        //console.log('updated. Post: %s', JSON.stringify(post));        
+        /*
+        console.log('updated. Post: %s', JSON.stringify(post));
+        //*/ 
     });
 };
 
 //Add a Post
 exports.addpost = function (req, res, next) {
-    // body...
+
+    /* 
+        1. Get Current datetime
+        2. Shortcut for ObjectId
+        3. Store new tags string for later use
+        4. Prepare for updated data
+    */
+
+    Step(
+    function findUser() {
+        db.users.findOne({ email : 'etanxing@gmail.com'}, this);
+    },
+
+    function insertUser(err, user) {
+        if (err) return next(err);
+
+        if (user) return [user];
+
+        var newUser = {
+            _id : '518e16c1c8ed5fb4ae000001',
+            email : 'etanxing@gmail.com',
+            password : '111111',
+            nickname : 'william',
+            status   : 1
+        };
+
+        db.users.insert(newUser, this);
+    },
+
+    function insertBlog(err, users) {
+        if (err) return next(err);
+
+        var now = moment(),
+            date = moment(req.body.date, 'DD/MM/YYYY hh:mm A'),
+            newPost = {
+            author : { name: users[0].nickname, _id: users[0]._id },
+            date : date.format(),
+            modified : now.format(),
+            date_gmt : date.utc().format(),
+            modified_gmt : now.utc().format(),
+            content : req.body.content,
+            title : req.body.title,
+            status : req.body.status,
+            password : req.body.password,
+            type : req.body.type,
+            tags : req.body.tags.map(function(tag) { return tag.replace(/^\s+|\s+$/g,''); })
+        };
+
+        newPost.slug = newPost.title.replace(/\s+|:|\+/g,'-');
+        db.posts.insert(newPost, this);
+    },
+
+    function finish (err, post) {
+        if (err) return next(err);
+        res.json(200);
+    }
+    )
 }
 
 //Update item's name by id

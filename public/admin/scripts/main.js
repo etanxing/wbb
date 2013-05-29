@@ -45,7 +45,8 @@ require.config({
         text: '../bower_components/requirejs-text/text',
         paginator : '../bower_components/backbone.paginator/lib/backbone.paginator',
         'Backbone.Stickit' : '../bower_components/backbone.stickit/backbone.stickit',
-        moment : '../bower_components/moment/moment'
+        moment : '../bower_components/moment/moment',
+        humane : '../bower_components/humane-js/humane.min'
     }
 });
 

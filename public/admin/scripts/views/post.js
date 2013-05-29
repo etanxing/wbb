@@ -7,8 +7,9 @@ define([
     'moment',
     '../models/post',
     'text!../templates/post.html',
+    'humane',
     'tagsinput'
-], function ($, _, Backbone, moment, Post, post) {
+], function ($, _, Backbone, moment, Post, post, humane) {
     'use strict';
 
     var PostView = Backbone.View.extend({
@@ -98,10 +99,12 @@ define([
 
             //Unbinding model and form input
             this.unstickit();
-            this.detach();
+            this.$el.detach();
         },
 
         update : function (e) {
+            this.$('.control-group').removeClass('error');
+            
             this.model.save({
                 // 'title'  : this.$('#title').val(),
                 // 'slug'   : this.$('#slug').val(),
@@ -122,14 +125,17 @@ define([
         },
 
         showErrors : function (model, errors) {
-            var self = this;
-
-            this.$('.control-group').removeClass('error');
+            var self = this,
+                msg = [],
+                errors = _.filter(errors, function(error) { return error.err });
 
             _.each(errors, function (error) {
                 self.$('#' + error.attr)
-                .parent('.control-group').addClass('error');
+                .parent('.control-group').addClass('error'); 
+                _.each(error.msg, function(errmsg) { msg.push(errmsg)});
             })
+
+            humane.log(msg);
         }
     });
 

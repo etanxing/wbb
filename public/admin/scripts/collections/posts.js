@@ -25,7 +25,7 @@ define([
 		paginator_ui: {
 			firstPage: 1,
 			currentPage: 1,
-			perPage: 5,
+			perPage: 10,
 			totalPages: 10
 		}
 	});
