@@ -13,15 +13,7 @@ require.config({
             ],
             exports: 'Backbone'
         },
-        paginator : {
-            deps : ['backbone'],
-            exports : 'Backbone.Paginator'
-        },
 
-        'Backbone.Stickit' : {
-            deps: ['backbone'],
-            exports: 'Backbone'
-        },
         'jquery-ui': {
             deps: ['jquery'],            
             exports: 'jquery'
@@ -43,8 +35,8 @@ require.config({
         backbone: '../bower_components/backbone-amd/backbone',
         underscore: '../bower_components/underscore-amd/underscore',
         text: '../bower_components/requirejs-text/text',
-        paginator : '../bower_components/backbone.paginator/lib/backbone.paginator',
-        'Backbone.Stickit' : '../bower_components/backbone.stickit/backbone.stickit',
+        paginator : 'vendor/backbone.paginator',
+        stickit   : 'vendor/backbone.stickit',
         moment : '../bower_components/moment/moment',
         humane : '../bower_components/humane-js/humane.min'
     }

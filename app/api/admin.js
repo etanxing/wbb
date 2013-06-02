@@ -90,8 +90,8 @@ exports.updatepost = function (req, res, next) {
     delete data._id;
     delete data.author;
     delete data.tags;
-    data.date = moment(data.date).format();
-    data.date_gmt = moment(data.date).utc().format();
+    data.date = moment(data.date, 'DD/MM/YYYY hh:mm A').format('YYYY-MM-DDTHH:mm:ss Z');
+    data.date_gmt = moment(data.date, 'DD/MM/YYYY hh:mm A').utc().format('YYYY-MM-DDTHH:mm:ss Z');
     data.modified = now.format();
     data.modified_gmt = now.utc().format();
 
@@ -222,9 +222,9 @@ exports.addpost = function (req, res, next) {
             date = moment(req.body.date, 'DD/MM/YYYY hh:mm A'),
             newPost = {
             author : { name: users[0].nickname, _id: users[0]._id },
-            date : date.format(),
+            date : date.format('YYYY-MM-DDTHH:mm:ss Z'),
             modified : now.format(),
-            date_gmt : date.utc().format(),
+            date_gmt : date.utc().format('YYYY-MM-DDTHH:mm:ss Z'),
             modified_gmt : now.utc().format(),
             content : req.body.content,
             title : req.body.title,

@@ -3,12 +3,13 @@
 define([
     'datetimepicker',
     'underscore',
-    'Backbone.Stickit',
+    'backbone',
     'moment',
     '../models/post',
     'text!../templates/post.html',
     'humane',
-    'tagsinput'
+    'tagsinput',
+    'stickit'
 ], function ($, _, Backbone, moment, Post, post, humane) {
     'use strict';
 
@@ -23,12 +24,7 @@ define([
         bindings: {
             '#title'  : 'title',
             '#slug'   : 'slug',
-            '#date'   : {
-                observe: 'date',
-                onGet: function (date) {
-                    return moment(date).format("DD/MM/YYYY hh:mm A");
-                }
-            },
+            '#date'   : 'date',
             '#content': 'content',
             '#status' : {
                 observe: 'status',
@@ -79,6 +75,10 @@ define([
                 isNew : this.model.isNew()
             }));
 
+            //Refomat existing post's date
+            if (!this.model.isNew()) 
+                this.model.set('date', moment(this.model.get('date'), 'YYYY-MM-DDTHH:mm:ss Z').format('DD/MM/YYYY hh:mm A'));
+
             //Binding model and form input
             this.stickit();
 
@@ -99,27 +99,24 @@ define([
 
             //Unbinding model and form input
             this.unstickit();
+
+            //Clear form
+            this.$('.control-group input, .control-group textarea').val('');
+            //Remove from doc temp
             this.$el.detach();
         },
 
         update : function (e) {
+            var isNew = this.model.isNew();
             this.$('.control-group').removeClass('error');
-            
-            this.model.save({
-                // 'title'  : this.$('#title').val(),
-                // 'slug'   : this.$('#slug').val(),
-                // 'content': this.$('#content').val(),
-                // 'status' : this.$('#status').val(),
-                // 'date'   : this.$('#date').val(),
-                // 'type'   : this.$('#type').val(),
-                // 'tags'   : this.$('#tags').val(),
-            }, {
+            humane.log((isNew?'Sav':'Updat') + 'ing Post');
+            this.model.save({}, {
                 wait : true,
                 success : function () {
-                    alert('success');
+                    humane.log('Successfully ' + (isNew?'save':'update'));
                 },
                 error: function () {
-                    alert('failed to save');
+                    humane.log('Failed to ' + (isNew?'save':'update'));
                 }
             })
         },
