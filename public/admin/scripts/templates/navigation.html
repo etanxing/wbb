@@ -1,9 +1,18 @@
-<div class="refine">
+<div class="refine clearfix">
 	<nav class="refinestatus">
-		<a href="#" data-status="-1" class="active">All</a> | <a href="#" data-status="3">Published</a> | <a href="#" data-status="2">Password</a> | <a href="#" data-status="1">Draft</a>
+		<ul class="unstyled">
+			<li data-status="-1" class="<%=filters[0].value === -1 ? 'active':''%>">All</li>
+			<li data-status="3" class="<%=filters[0].value === 3 ? 'active':''%>">Published</li>
+			<li data-status="2" class="<%=filters[0].value === 2 ? 'active':''%>">Password</li>
+			<li data-status="1" class="<%=filters[0].value === 1 ? 'active':''%>">Draft</li>
+		</ul>
 	</nav>
 	<nav class="refinetype">
-		<a href="#" data-type="-1">All</a> | <a href="#" data-type="1" class="active">Post</a> | <a href="#" data-type="2">Page</a>
+		<ul class="unstyled">
+			<li data-type="-1" class="<%=filters[1].value === -1 ? 'active':''%>">All</li>
+			<li data-type="1" class="<%=filters[1].value === 1 ? 'active':''%>">Post</li>
+			<li data-type="2" class="<%=filters[1].value === 2 ? 'active':''%>">Page</li>
+		</ul>
 	</nav>
 </div>
 <span class="cell last pages">

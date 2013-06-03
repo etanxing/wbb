@@ -17,7 +17,7 @@ define([
             'click a.last': 'gotoLast',
             'click a.page': 'gotoPage',
             'click .howmany a': 'changeCount',
-            'click .refine a ': 'filter'
+            'click .refine li ': 'filter'
         },
 
         initialize: function () {
@@ -66,56 +66,24 @@ define([
             this.collection.howManyPer(per);
         },
 
-        getFilterField: function () {
-            //return $('#filterByOption').val();
-            return ['status','type']
-        },
-
-        getFilterValue: function (e) {
-            //return $('#filterString').val();
-            //return ['status','type']
-            return [e.target.innerText,1]
-        },
-
-        preserveFilterField: function (field) {
-            $('#filterByOption').val(field);
-        },
-
-        preserveFilterValue: function (value) {
-            $('#filterString').val(value);
-        },
-
         filter: function (e) {
             e.preventDefault();
 
-            var fields = this.getFilterField();
-            /*Note that this is an example! 
-             * You can create an array like 
-             * 
-             * fields = ['Name', 'Description', ...];
-             *
-             *Or an object with rules like
-             *
-             * fields = {
-             *              'Name': {cmp_method: 'levenshtein', max_distance: 7}, 
-             *              'Description': {cmp_method: 'regexp'},
-             *              'Rating': {} // This will default to 'regexp'
-             *          };
-             */
+            var status = $(e.target).data('status'),
+                type = $(e.target).data('type'),
+                laststatus = this.$('.refinestatus li.active').data('status'),
+                lasttype = this.$('.refinetype li.active').data('type'),
+                rules = [];
 
-            //var filter = this.getFilterValue(e);
-            var filterStatus = $(e.target).data('status');
-            filterStatus = filterStatus === -1
+            if (status) {
+                rules.push({ field: 'status', type: status === -1 ?'min':'equalTo', value: status },
+                           { field: 'type', type: lasttype === -1 ? 'min':'equalTo', value: lasttype });
+            } else {
+                rules.push({ field: 'status', type: laststatus === -1 ?'min':'equalTo', value: laststatus },
+                           { field: 'type', type: type === -1 ? 'min':'equalTo', value: type });
+            }            
             
-            //this.collection.setFilter(fields, filter);
-            this.collection.setFieldFilter([
-                { field: 'status', type: 'equalTo', value: $(e.target).data('status') },
-                { field: 'type', type: 'equalTo', value: 1 }
-            ]);
-            //this.collection.pager();
-
-            //this.preserveFilterField(fields);
-            //this.preserveFilterValue(filter);
+            this.collection.setFieldFilter(rules);
         }
     });
 

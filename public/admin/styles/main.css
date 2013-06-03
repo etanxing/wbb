@@ -64,6 +64,11 @@ body {
 
 .login-form .login-field {
 	width: 409px;
+	height: 47px;
+}
+
+.login-form .login-field-icon {
+	right: 20px;
 }
 
 .other-account a {
@@ -82,7 +87,7 @@ body {
 }
 
 .other-account a:hover {
-	padding-right: 100px;
+	padding-right: 130px;
 }
 
 #container > div[class$=-view] {
@@ -91,6 +96,19 @@ body {
 
 #container div.login-view {
 	margin-left: 0;
+}
+
+.refine li {
+	float: left;
+	padding-left: 5px;
+}
+
+.refine li:not(:first-child):before {
+	content: '|'
+}
+
+.refine li.active {
+	font-weight: 600;
 }
 
 

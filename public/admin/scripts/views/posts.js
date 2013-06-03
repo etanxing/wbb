@@ -7,8 +7,9 @@ define([
     '../common',
     '../views/listpost',
     '../views/navigation',
-    'text!../templates/posts.html'
-], function ($, _, Backbone, Common, ListPostView, NavigationView, posts) {
+    'text!../templates/posts.html',
+    'humane'
+], function ($, _, Backbone, Common, ListPostView, NavigationView, posts, humane) {
     'use strict';
 
     var PostsView = Backbone.View.extend({        
@@ -27,7 +28,10 @@ define([
             this.$el.html(posts);
             this.collection.fetch({
                 success: this.renderNavigation,
-                silent:true
+                silent:true,
+                error : function(collection, resp) {
+                    humane.log(resp);
+                }
             });
 
             return this;
