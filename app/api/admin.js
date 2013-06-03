@@ -7,8 +7,11 @@ var Step = require('step'),
 
 //Check User
 exports.usercheck = function (req, res, next) {
-    console.log('user check');
-    next();
+    if (!req.isAuthenticated()) {
+        console.log('user check failed');
+        return res.json(401);
+    }
+    next()
 };
 
 exports.data = function (req, res, next) {

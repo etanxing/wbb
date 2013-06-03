@@ -34,13 +34,13 @@ define([
         },
 
         addAll : function() {
-            this.$('.postlist').empty();
+            this.$('.postlist tbody').empty();
             this.collection.each(this.addOne);
         },
 
         addOne: function (post) {
             var view = new ListPostView({model:post});
-            this.$('.postlist').append(view.render().el);
+            this.$('.postlist tbody').append(view.render().el);
         },
 
         renderNavigation : function () {            

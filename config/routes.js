@@ -1,4 +1,4 @@
-module.exports = function (app) {
+module.exports = function (app, passport) {
 
     /***************** ROUTERS START ******************/ 
     var common = require('../app/controllers/common');
@@ -29,6 +29,9 @@ module.exports = function (app) {
 
     /***************** Admin API START ******************/
     var admin = require('../app/api/admin');
+
+    //Login
+    app.post('/admin', passport.authenticate('local', { successRedirect: '/admin/dashboard', failureRedirect: '/admin/', failureFlash: true }));
 
     //Get Counters
     app.get('/admin/api/data', admin.usercheck, admin.data);

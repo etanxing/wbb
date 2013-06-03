@@ -17,7 +17,7 @@ define([
             'click a.last': 'gotoLast',
             'click a.page': 'gotoPage',
             'click .howmany a': 'changeCount',
-            'click a.filter': 'filter'
+            'click .refine a ': 'filter'
         },
 
         initialize: function () {
@@ -67,11 +67,14 @@ define([
         },
 
         getFilterField: function () {
-            return $('#filterByOption').val();
+            //return $('#filterByOption').val();
+            return ['status','type']
         },
 
-        getFilterValue: function () {
-            return $('#filterString').val();
+        getFilterValue: function (e) {
+            //return $('#filterString').val();
+            //return ['status','type']
+            return [e.target.innerText,1]
         },
 
         preserveFilterField: function (field) {
@@ -100,13 +103,19 @@ define([
              *          };
              */
 
-            var filter = this.getFilterValue();
+            //var filter = this.getFilterValue(e);
+            var filterStatus = $(e.target).data('status');
+            filterStatus = filterStatus === -1
             
-            this.collection.setFilter(fields, filter);
-            this.collection.pager();
+            //this.collection.setFilter(fields, filter);
+            this.collection.setFieldFilter([
+                { field: 'status', type: 'equalTo', value: $(e.target).data('status') },
+                { field: 'type', type: 'equalTo', value: 1 }
+            ]);
+            //this.collection.pager();
 
-            this.preserveFilterField(fields);
-            this.preserveFilterValue(filter);
+            //this.preserveFilterField(fields);
+            //this.preserveFilterValue(filter);
         }
     });
 

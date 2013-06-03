@@ -1,51 +1,59 @@
+<div class="refine">
+	<nav class="refinestatus">
+		<a href="#" data-status="-1" class="active">All</a> | <a href="#" data-status="3">Published</a> | <a href="#" data-status="2">Password</a> | <a href="#" data-status="1">Draft</a>
+	</nav>
+	<nav class="refinetype">
+		<a href="#" data-type="-1">All</a> | <a href="#" data-type="1" class="active">Post</a> | <a href="#" data-type="2">Page</a>
+	</nav>
+</div>
 <span class="cell last pages">
-				<% if (currentPage != 1) { %>
-					<a href="#" class="first">First</a>
-					<a href="#" class="prev">Previous</a>
-				<% } %>
-				<% _.each (pageSet, function (p) { %>
-					<% if (currentPage == p) { %>
-						<span class="page selected"><%= p %></span>
-					<% } else { %>
-						<a href="#" class="page"><%= p %></a>
-					<% } %>
-				<% }); %>
-				<% if (lastPage != currentPage && lastPage != 0) { %>
-					<a href="#" class="next">Next</a>
-					<a href="#" class="last">Last</a>
-				<% } %>
-			</span>
+	<% if (currentPage != 1) { %>
+		<a href="#" class="first">First</a>
+		<a href="#" class="prev">Previous</a>
+	<% } %>
+	<% _.each (pageSet, function (p) { %>
+		<% if (currentPage == p) { %>
+			<span class="page selected"><%= p %></span>
+		<% } else { %>
+			<a href="#" class="page"><%= p %></a>
+		<% } %>
+	<% }); %>
+	<% if (lastPage != currentPage && lastPage != 0) { %>
+		<a href="#" class="next">Next</a>
+		<a href="#" class="last">Last</a>
+	<% } %>
+</span>
 
-			<span class="divider">/</span>
+<span class="divider">/</span>
 
-			<span class="cell howmany">
-				Show
-				<a href="#" class="selected">3</a>
-				|
-				<a href="#" class="">9</a>
-				|
-				<a href="#" class="">12</a>
-			</span>
+<span class="cell howmany">
+	Show
+	<a href="#" class="selected">3</a>
+	|
+	<a href="#" class="">9</a>
+	|
+	<a href="#" class="">12</a>
+</span>
 
-			<span class="divider">/</span>
-			
-			<span class="cell first records">
-				<span class="current"><%= startRecord %></span>
-				-
-				<span class="perpage"><%= endRecord %></span>
-				of
-				<span class="total"><%= totalRecords %></span>
-							shown
-			</span>
+<span class="divider">/</span>
 
-			<select id="filterByOption">
-				<option value="cid">Select a field to filter on</option>
-				<option value="Name">name</option>
-				<option value="Runtime">runtime</option>
-				<option value="Rating">rating</option>
-			</select>
+<span class="cell first records">
+	<span class="current"><%= startRecord %></span>
+	-
+	<span class="perpage"><%= endRecord %></span>
+	of
+	<span class="total"><%= totalRecords %></span>
+				shown
+</span>
 
-			<span class="cell sort">
-				<input id="filterString" type="text" class="cell" />
-				<a href="#" class="filter btn small">Filter</a>
-			</span>
+<select id="filterByOption">
+	<option value="cid">Select a field to filter on</option>
+	<option value="Name">name</option>
+	<option value="Runtime">runtime</option>
+	<option value="Rating">rating</option>
+</select>
+
+<span class="cell sort">
+	<input id="filterString" type="text" class="cell" />
+	<a href="#" class="filter btn small">Filter</a>
+</span>

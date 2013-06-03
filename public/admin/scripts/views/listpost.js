@@ -3,12 +3,13 @@
 define([
     'jquery',
     'backbone',
-    'text!../templates/listpost.html'
-], function ($, Backbone, listpost) {
+    'text!../templates/listpost.html',
+    'moment'
+], function ($, Backbone, listpost, moment) {
     'use strict';
 
     var PostView = Backbone.View.extend({
-        tagName : 'li',
+        tagName : 'tr',
 
         className : 'listpost',
 

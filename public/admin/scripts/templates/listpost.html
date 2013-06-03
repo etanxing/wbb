@@ -1,1 +1,8 @@
-<a href="post/<%=post._id %>" title="<%=post.title %>"><%=post.title %></a>
+<!-- <a href="post/<%=post._id %>" title="<%=post.title %>"><%=post.title %></a> -->
+<th><input type="checkbox"></th>
+<th><a href="post/<%=post._id %>"><%=post.title %></a></th>
+<th><%=post.author.name %></th>
+<th><%=post.tags.join(', ') %></th>
+<th><%=post.status %></th>
+<th><%=moment(post.date, 'YYYY-MM-DDTHH:mm:ss Z').format('DD/MM/YYYY hh:mm A') %></th>
+<th><%=post.type %></th>
