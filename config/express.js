@@ -78,6 +78,16 @@ module.exports = function (app, config, passport) {
 
         // log Errors
         app.use(function(err, req, res, next){
+            var message = '';
+            switch (err.message) {
+                case 'E0001':
+                    err.message = 'user check failed';
+                    break;
+                default:
+                    message = err.message;
+                break;
+            }
+
             console.log('Error logged: %s', err.message);            
             console.error(err.stack);
             next(err);
@@ -86,7 +96,7 @@ module.exports = function (app, config, passport) {
         // client Error Handler
         app.use(function(err, req, res, next){
             if (req.xhr) {
-                res.json(500, { error: err });
+                res.json(500, { msg: err.message, err: true });
             } else {
                 next(err);
             }

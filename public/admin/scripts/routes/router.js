@@ -53,32 +53,40 @@ define([
         },
 
         index: function(){
-            this.setBody('login');
+            this.setBody('login', false);
         },
 
         dashboard : function() {
-            this.setBody('dashboard');
+            this.setBody('dashboard', true);
         },
 
         posts : function() {
-            this.setBody('posts');
+            this.setBody('posts', true);
         },
 
         post : function(id) {
-            this.setBody('post', id);
+            this.setBody('post', id, true);
         },
 
         page404: function() {
             console.log('r u lost?');
         },
 
-        setBody: function(viewname, options) {
-            this.view && this.view.unrender();
-            this.view = this.views[viewname];
-            $('#container')
-            .prepend(this.view.el);
+        setBody: function() {
+            var arrys = _.toArray(arguments),
+                auth = arrys.pop(),
+                viewname = arrys.shift();
 
-            this.view.render(options);
+            if ( !auth || auth && user.id ) {
+                this.view && this.view.unrender();
+                this.view = this.views[viewname];
+                $('#container')
+                .prepend(this.view.el);
+
+                this.view.render(arrys);
+            } else {
+                this.navigate('admin/', true);
+            }
         }
     });
 

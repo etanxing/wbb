@@ -1,8 +1,12 @@
-<!-- <a href="post/<%=post._id %>" title="<%=post.title %>"><%=post.title %></a> -->
-<th><input type="checkbox"></th>
-<th><a href="post/<%=post._id %>"><%=post.title %></a></th>
-<th><%=post.author.name %></th>
-<th><%=post.tags.join(', ') %></th>
-<th><%=post.status %></th>
-<th><%=moment(post.date, 'YYYY-MM-DDTHH:mm:ss Z').format('DD/MM/YYYY hh:mm A') %></th>
-<th><%=post.type %></th>
+<th>
+	<div class="checkbox">
+  	<input type="checkbox" value="None" id="check<%=post._id%>" />
+	<label for="check<%=post._id%>"></label>
+	</div>
+</th>
+<td><a href="post/<%=post._id %>"><%=post.title %></a></td>
+<td><%=post.author.name %></td>
+<td><%=post.tags.join(', ') %></td>
+<td><%=post.status %></td>
+<td><%=moment(post.date, 'YYYY-MM-DDTHH:mm:ss Z').format('DD/MM/YYYY hh:mm A') %></td>
+<td><%=post.type %></td>

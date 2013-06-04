@@ -1,68 +1,67 @@
-<div class="refine clearfix">
-	<nav class="refinestatus">
-		<ul class="unstyled">
-			<li data-status="-1" class="<%=filters[0].value === -1 ? 'active':''%>">All</li>
-			<li data-status="3" class="<%=filters[0].value === 3 ? 'active':''%>">Published</li>
-			<li data-status="2" class="<%=filters[0].value === 2 ? 'active':''%>">Password</li>
-			<li data-status="1" class="<%=filters[0].value === 1 ? 'active':''%>">Draft</li>
+<div class="refine">
+	<nav class="refinetype">
+		<ul class="nav nav-pills">
+			<li data-type="-1" class="<%=filters[1].value === -1 ? 'active':''%>"><a href="#">All</a></li>
+			<li data-type="1" class="<%=filters[1].value === 1 ? 'active':''%>"><a href="#">Post</a></li>
+			<li data-type="2" class="<%=filters[1].value === 2 ? 'active':''%>"><a href="#">Page</a></li>
 		</ul>
 	</nav>
-	<nav class="refinetype">
-		<ul class="unstyled">
-			<li data-type="-1" class="<%=filters[1].value === -1 ? 'active':''%>">All</li>
-			<li data-type="1" class="<%=filters[1].value === 1 ? 'active':''%>">Post</li>
-			<li data-type="2" class="<%=filters[1].value === 2 ? 'active':''%>">Page</li>
+	<nav class="refinestatus">
+		<ul class="nav nav-pills">
+			<li data-status="-1" class="<%=filters[0].value === -1 ? 'active':''%>"><a href="#">All</a></li>
+			<li data-status="1" class="<%=filters[0].value === 1 ? 'active':''%>"><a href="#">Published</a></li>
+			<li data-status="2" class="<%=filters[0].value === 2 ? 'active':''%>"><a href="#">Password</a></li>
+			<li data-status="3" class="<%=filters[0].value === 3 ? 'active':''%>"><a href="#">Draft</a></li>
 		</ul>
 	</nav>
 </div>
-<span class="cell last pages">
+<!-- <div class="pages">
 	<% if (currentPage != 1) { %>
 		<a href="#" class="first">First</a>
 		<a href="#" class="prev">Previous</a>
 	<% } %>
-	<% _.each (pageSet, function (p) { %>
-		<% if (currentPage == p) { %>
-			<span class="page selected"><%= p %></span>
-		<% } else { %>
-			<a href="#" class="page"><%= p %></a>
-		<% } %>
-	<% }); %>
+
 	<% if (lastPage != currentPage && lastPage != 0) { %>
 		<a href="#" class="next">Next</a>
 		<a href="#" class="last">Last</a>
 	<% } %>
-</span>
-
-<span class="divider">/</span>
-
-<span class="cell howmany">
-	Show
-	<a href="#" class="selected">3</a>
-	|
-	<a href="#" class="">9</a>
-	|
-	<a href="#" class="">12</a>
-</span>
-
-<span class="divider">/</span>
-
-<span class="cell first records">
+</div> -->
+<div class="pagination">
+	<ul>
+		<% if (totalPages > 1) { %>
+		<li class="previous"><a href="#" class="icon-angle-left"></a></li>
+		<% } %>
+		<% _.each (pageSet, function (p) { %>
+		<% if (currentPage == p) { %>
+			<li class="page active"><a href="#"><%= p %></a></li>
+		<% } else { %>
+			<li><a href="#" class="page"><%= p %></a></li>
+		<% } %>
+		<% }); %>
+		<% if (totalPages > 1) { %>
+		<li class="next"><a href="#" class="icon-angle-right"></a></li>
+		<% } %>
+	</ul>
+</div>
+<div class="howmany btn-toolbar">
+	<div class="btn-group">
+		<% _.each([10,20,50], function(perpage) { %>
+		<a class="btn btn-primary <%=perPage === perpage?'active':''%>" href="#"><%=perpage%></a>
+		<% })%>
+	</div>
+</div>
+<div class="records">
+	<h3>
 	<span class="current"><%= startRecord %></span>
 	-
 	<span class="perpage"><%= endRecord %></span>
 	of
 	<span class="total"><%= totalRecords %></span>
 				shown
-</span>
+	</h3>
+</div>
 
-<select id="filterByOption">
-	<option value="cid">Select a field to filter on</option>
-	<option value="Name">name</option>
-	<option value="Runtime">runtime</option>
-	<option value="Rating">rating</option>
-</select>
-
-<span class="cell sort">
-	<input id="filterString" type="text" class="cell" />
-	<a href="#" class="filter btn small">Filter</a>
-</span>
+<div class="search">
+	<input class="search-query" type="text" />
+	<a href="#" class="btn btn-primary">Search</a>
+</div>

@@ -29,8 +29,9 @@ define([
             this.collection.fetch({
                 success: this.renderNavigation,
                 silent:true,
-                error : function(collection, resp) {
-                    humane.log(resp);
+                error : function(collection, resp, options) {
+                    var err = JSON.parse(resp.responseText);
+                    humane.log(err.msg);                    
                 }
             });
 
@@ -40,6 +41,7 @@ define([
         addAll : function() {
             this.$('.postlist tbody').empty();
             this.collection.each(this.addOne);
+            this.collection.models.length === 0 && this.$('.postlist tbody').html('<tr><td colspan="7">No posts or pages found.</td></tr>');
         },
 
         addOne: function (post) {
@@ -49,8 +51,8 @@ define([
 
         renderNavigation : function () {            
             this.collection.pager();                   
-            this.navigationViewUp = new NavigationView({collection : this.collection}),
-            this.navigationViewDown = new NavigationView({collection : this.collection});
+            this.navigationViewUp = new NavigationView({collection : this.collection, className : 'navigation up'}),
+            this.navigationViewDown = new NavigationView({collection : this.collection, className : 'navigation down'});
             this.$('.postlist')
             .before(this.navigationViewUp.render().el)
             .after(this.navigationViewDown.render().el);                

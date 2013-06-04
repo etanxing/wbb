@@ -139,7 +139,8 @@ define([
         var error = queryOptions.error;
         queryOptions.error = function ( xhr ) {
           if ( error ) {
-            error( model, xhr, queryOptions );
+            //error( model, xhr, queryOptions );
+            error( xhr );
           }
           if ( model && model.trigger ) {
             model.trigger( 'error', model, xhr, queryOptions );

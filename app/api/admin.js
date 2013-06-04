@@ -9,7 +9,7 @@ var Step = require('step'),
 exports.usercheck = function (req, res, next) {
     if (!req.isAuthenticated()) {
         console.log('user check failed');
-        return res.json(401);
+        return next(new Error('E0001'));
     }
     next()
 };

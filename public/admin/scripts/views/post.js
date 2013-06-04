@@ -60,7 +60,7 @@ define([
             this.model = new Post();            
             this.listenTo(this.model, 'invalid', this.showErrors)
 
-            if (id) {
+            if (!_.isArray(id) && id.length > 0 && id[0] ) {
                 this.model.set('_id', id);
                 this.model.fetch({ success : this.renderPost });
             } else {

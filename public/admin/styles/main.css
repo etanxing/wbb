@@ -5,116 +5,214 @@
     box-sizing: border-box;
 }
 
+/* Checkbox Styles */
+.checkbox {
+    width: 20px;
+    position: relative;
+}
+
+.checkbox label {
+    cursor: pointer;
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    top: 0;
+    left: 0;
+    border-radius: 4px;
+    background: #1abc9c
+}
+
+.checkbox label:after {
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+    filter: alpha(opacity=0);
+    opacity: 0;
+    content: '';
+    position: absolute;
+    width: 9px;
+    height: 5px;
+    background: transparent;
+    top: 7px;
+    left: 6px;
+    border: 3px solid #fff;
+    border-top: none;
+    border-right: none;
+    -webkit-transform: rotate(-45deg);
+    -moz-transform: rotate(-45deg);
+    -o-transform: rotate(-45deg);
+    -ms-transform: rotate(-45deg);
+    transform: rotate(-45deg);
+}
+
+.checkbox label:hover::after {
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=30)";
+    filter: alpha(opacity=30);
+    opacity: 0.5;
+}
+
+.checkbox input[type=checkbox]:checked + label:after {
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
+    filter: alpha(opacity=100);
+    opacity: 1;
+}
+
 #ui-datepicker-div {
-	width: 15em;
+    width: 15em;
 }
 /* css for timepicker */
-.ui-timepicker-div .ui-widget-header { margin-bottom: 8px; }
-.ui-timepicker-div dl { text-align: left; }
-.ui-timepicker-div dl dt { height: 25px; margin-bottom: -25px; }
-.ui-timepicker-div dl dd { margin: 0 10px 10px 65px; }
-.ui-timepicker-div td { font-size: 90%; }
-.ui-tpicker-grid-label { background: none; border: none; margin: 0; padding: 0; }
+.ui-timepicker-div .ui-widget-header {
+    margin-bottom: 8px;
+}
 
-.ui-timepicker-rtl{ direction: rtl; }
-.ui-timepicker-rtl dl { text-align: right; }
-.ui-timepicker-rtl dl dd { margin: 0 65px 10px 10px; }
+.ui-timepicker-div dl {
+    text-align: left;
+}
+
+.ui-timepicker-div dl dt {
+    height: 25px;
+    margin-bottom: -25px;
+}
+
+.ui-timepicker-div dl dd {
+    margin: 0 10px 10px 65px;
+}
+
+.ui-timepicker-div td {
+    font-size: 90%;
+}
+
+.ui-tpicker-grid-label {
+    background: none;
+    border: none;
+    margin: 0;
+    padding: 0;
+}
+
+.ui-timepicker-rtl {
+    direction: rtl;
+}
+
+.ui-timepicker-rtl dl {
+    text-align: right;
+}
+
+.ui-timepicker-rtl dl dd {
+    margin: 0 65px 10px 10px;
+}
 
 body {
-	background: #f4f4f4 url(http://i.imgur.com/Okzc1Bk.png);
+    background: #f4f4f4 url(http://i.imgur.com/Okzc1Bk.png);
 }
 
 #container {
-	position: relative;
+    position: relative;
 }
 
 .sidemenu {
-	position: absolute;
-	top:0;
-	width: 200px;
+    position: absolute;
+    top: 0;
+    width: 200px;
 }
 
 .login-view + .sidemenu {
-	display: none;
+    display: none;
 }
 
 .login-view .login {
-	background: none;
-	color: #000000;
-	padding: 100px 38px;
+    background: none;
+    color: #000000;
+    padding: 100px 38px;
 }
 
 .login-view .login-screen {
-	background-color: transparent;
-	width: 589px;
-	margin: 0 auto;
-	padding: 0;
-	position: relative;
+    background-color: transparent;
+    width: 589px;
+    margin: 0 auto;
+    padding: 0;
+    position: relative;
 }
 
 .login-screen .login-icon {
-	left: 0;
-	top: 0;
-	width: 96px;
+    left: 0;
+    top: 0;
+    width: 96px;
 }
 
 .login-form {
-	margin-left: 120px;
+    margin-left: 120px;
 }
 
 .login-form .login-field {
-	width: 409px;
-	height: 47px;
+    width: 409px;
 }
 
 .login-form .login-field-icon {
-	right: 20px;
+    right: 20px;
 }
 
 .other-account a {
-	text-decoration: none;
-	width: 36px;
-	display: inline-block;
-	padding-right: 5px;
-	overflow: hidden;
-	transition: padding-right 200ms;
+    text-decoration: none;
+    width: 36px;
+    display: inline-block;
+    padding-right: 5px;
+    overflow: hidden;
+    transition: padding-right 200ms;
 }
 
 .other-account a span {
-	margin-left: 5px;
-	font-size: 1.5em;
-	vertical-align: 7px;
+    margin-left: 5px;
+    font-size: 1.5em;
+    vertical-align: 7px;
 }
 
 .other-account a:hover {
-	padding-right: 130px;
+    padding-right: 130px;
 }
 
 #container > div[class$=-view] {
-	margin-left: 200px;
+    margin-left: 200px;
 }
 
 #container div.login-view {
-	margin-left: 0;
+    margin-left: 0;
 }
 
-.refine li {
+.navigation {
+	position: relative;
+}
+
+.posts-view .navigation > div {
+	float: right;
+}
+
+.navigation.up .refine {
 	float: left;
-	padding-left: 5px;
 }
 
-.refine li:not(:first-child):before {
-	content: '|'
+.posts-view .navigation.up .howmany,
+.posts-view .navigation.down .search, 
+.posts-view .navigation.down .refine,
+.posts-view .navigation.down .pagination {
+	display: none;
 }
 
-.refine li.active {
-	font-weight: 600;
+.navigation.up .search, 
+.navigation.up .refinetype {
+	position: absolute;
+	top: -41px;
+	right: 0;
 }
 
+.navigation.up .search {
+	right:160px;
+	top: -46px;
+}
 
+.navigation.down .records {
+	float: none;
+}
 
 @media (min-width: 1200px) {
-	.login-form .login-field {
-		width: 409px;
-	}
+    .login-form .login-field {
+        width: 409px;
+    };
 }

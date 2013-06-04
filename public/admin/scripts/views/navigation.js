@@ -7,13 +7,11 @@ define([
 ], function ($, Backbone, navigation) {
     'use strict';
 
-    var NavigationView = Backbone.View.extend({
-        className : 'navigation',
-        
+    var NavigationView = Backbone.View.extend({       
         events: {
             'click a.first': 'gotoFirst',
-            'click a.prev': 'gotoPrev',
-            'click a.next': 'gotoNext',
+            'click .previous': 'gotoPrev',
+            'click .next': 'gotoNext',
             'click a.last': 'gotoLast',
             'click a.page': 'gotoPage',
             'click .howmany a': 'changeCount',
@@ -24,9 +22,8 @@ define([
             this.collection.on('reset', this.render, this);
         },
 
-        render : function(){
+        render : function(options){
             this.$el.html(_.template(navigation)(this.collection.info()));
-
             return this;
         },
 
@@ -69,8 +66,9 @@ define([
         filter: function (e) {
             e.preventDefault();
 
-            var status = $(e.target).data('status'),
-                type = $(e.target).data('type'),
+            var item = e.target.tagName === 'LI'?e.target:e.target.parentNode,
+                status = $(item).data('status'),
+                type = $(item).data('type'),
                 laststatus = this.$('.refinestatus li.active').data('status'),
                 lasttype = this.$('.refinetype li.active').data('type'),
                 rules = [];
