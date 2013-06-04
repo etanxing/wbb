@@ -1,31 +1,21 @@
 <div class="refine">
-	<nav class="refinetype">
-		<ul class="nav nav-pills">
-			<li data-type="-1" class="<%=filters[1].value === -1 ? 'active':''%>"><a href="#">All</a></li>
-			<li data-type="1" class="<%=filters[1].value === 1 ? 'active':''%>"><a href="#">Post</a></li>
-			<li data-type="2" class="<%=filters[1].value === 2 ? 'active':''%>"><a href="#">Page</a></li>
-		</ul>
+	<nav class="refinetype btn-toolbar">
+		<div class="btn-group">
+			<% _.each([['All', -1],['Post', 1], ['Page', 2]], function(type) { %>
+			<a class="btn btn-primary <%=filters[1].value === type[1] ? 'active':''%>" href="#" 
+				data-type="<%=type[1]%>"><%=type[0]%></a>
+			<% })%>
+		</div>
 	</nav>
-	<nav class="refinestatus">
-		<ul class="nav nav-pills">
-			<li data-status="-1" class="<%=filters[0].value === -1 ? 'active':''%>"><a href="#">All</a></li>
-			<li data-status="1" class="<%=filters[0].value === 1 ? 'active':''%>"><a href="#">Published</a></li>
-			<li data-status="2" class="<%=filters[0].value === 2 ? 'active':''%>"><a href="#">Password</a></li>
-			<li data-status="3" class="<%=filters[0].value === 3 ? 'active':''%>"><a href="#">Draft</a></li>
-		</ul>
+	<nav class="refinestatus btn-toolbar">
+		<div class="btn-group">
+			<% _.each([['All', -1],['Published', 1], ['Password', 2], ['Draft', 3]], function(status) { %>
+			<a class="btn btn-primary <%=filters[0].value === status[1] ? 'active':''%>" href="#" 
+				data-status="<%=status[1]%>"><%=status[0]%></a>
+			<% })%>
+		</div>
 	</nav>
 </div>
-<!-- <div class="pages">
-	<% if (currentPage != 1) { %>
-		<a href="#" class="first">First</a>
-		<a href="#" class="prev">Previous</a>
-	<% } %>
-
-	<% if (lastPage != currentPage && lastPage != 0) { %>
-		<a href="#" class="next">Next</a>
-		<a href="#" class="last">Last</a>
-	<% } %>
-</div> -->
 <div class="pagination">
 	<ul>
 		<% if (totalPages > 1) { %>

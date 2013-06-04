@@ -15,7 +15,7 @@ define([
             'click a.last': 'gotoLast',
             'click a.page': 'gotoPage',
             'click .howmany a': 'changeCount',
-            'click .refine li ': 'filter'
+            'click .refine a': 'filter'
         },
 
         initialize: function () {
@@ -66,11 +66,11 @@ define([
         filter: function (e) {
             e.preventDefault();
 
-            var item = e.target.tagName === 'LI'?e.target:e.target.parentNode,
+            var item = e.target,
                 status = $(item).data('status'),
                 type = $(item).data('type'),
-                laststatus = this.$('.refinestatus li.active').data('status'),
-                lasttype = this.$('.refinetype li.active').data('type'),
+                laststatus = this.$('.refinestatus a.active').data('status'),
+                lasttype = this.$('.refinetype a.active').data('type'),
                 rules = [];
 
             if (status) {
