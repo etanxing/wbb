@@ -17,8 +17,8 @@ module.exports = function (grunt) {
 
     // configurable paths
     var yeomanConfig = {
-        app: 'admin',
-        dist: 'dist'
+        app: 'public/admin',
+        dist: 'public/dist'
     };
 
     grunt.initConfig({
@@ -144,8 +144,7 @@ module.exports = function (grunt) {
         },
         usemin: {
             html: ['<%= yeoman.dist %>/{,*/}*.html'],
-            css: ['<%= yeoman.app %>/bower_components/Flat-UI/css/{,*/}*.css',
-                  '<%= yeoman.app %>/bower_components/humane-js/themes/jackedup.css', 
+            css: ['<%= yeoman.app %>/bower_components/humane-js/themes/jackedup.css', 
                   '<%= yeoman.dist %>/styles/{,*/}*.css'],
             options: {
                 dirs: ['<%= yeoman.dist %>']
@@ -165,7 +164,7 @@ module.exports = function (grunt) {
             dist: {
                 files: {
                     '<%= yeoman.dist %>/styles/main.css': [
-                        '<%= yeoman.app %>/bower_components/Flat-UI/css/{,*/}*.css',
+                        '<%= yeoman.app %>/bower_components/humane-js/themes/jackedup.css',
                         '.tmp/styles/{,*/}*.css',
                         '<%= yeoman.app %>/styles/{,*/}*.css'                    
                     ]
