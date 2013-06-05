@@ -176,39 +176,50 @@ body {
     margin-left: 0;
 }
 
-.navigation {
-	position: relative;
-}
-
-.posts-view .navigation > div {
-	float: right;
-}
-
-.navigation.up .refine {
-	float: left;
+.posts-view .search {
+    position: absolute;
+    top: 10px;
+    right: 0;
 }
 
 .posts-view .navigation.up .howmany,
-.posts-view .navigation.down .search, 
 .posts-view .navigation.down .refine,
 .posts-view .navigation.down .pagination {
 	display: none;
 }
 
-.navigation.up .search, 
-.navigation.up .refinetype {
-	position: absolute;
-	top: -41px;
-	right: 0;
+.navigation .pagination {
+    font-size: 14px;
+    margin: 0;
 }
 
-.navigation.up .search {
-	right:160px;
-	top: -46px;
+.navigation .pagination ul {
+    height: 41px;
 }
 
-.navigation.down .records {
-	float: none;
+.navigation.up .records {
+    position: absolute;
+    right: 7px;
+    top: -13px;
+    z-index: 1;
+}
+
+.pagination ul:empty ~ .records {
+    right: 0;
+    top: 0;
+}
+
+.pagination ul:empty ~ .records .label {
+    padding: 13px 10px 14px;
+    font-size: 1em;
+}
+
+.postlist .col.status, .postlist .col.type {
+    display: none;
+}
+
+.postlist.type .col.type, .postlist.status .col.status {
+    display: table-cell;
 }
 
 @media (min-width: 1200px) {

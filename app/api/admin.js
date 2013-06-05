@@ -197,6 +197,9 @@ exports.addpost = function (req, res, next) {
         4. Prepare for updated data
     */
 
+    var addedTags = [],
+        createdTags = [];
+
     Step(
     function findUser() {
         db.users.findOne({ email : 'etanxing@gmail.com'}, this);
@@ -238,10 +241,48 @@ exports.addpost = function (req, res, next) {
         };
 
         newPost.slug = newPost.title.replace(/\s+|:|\+/g,'-');
+        addedTags = newPost.tags;
         db.posts.insert(newPost, this);
     },
 
-    function finish (err, post) {
+    function findExistingTags(err, post) {
+        if (err) return next(err);
+        if (post.tags.length === 0) return 1;
+        db.tags.find( { taxonomy : { $in : post.tags } }, { taxonomy : 1, _id : 0 }, this);
+    },
+
+    function increaseTags(err, existingTags) {  
+        if (existingTags === 1) return 1;
+        if (err) return next(err);
+        var existingTags = existingTags.map(function (existingTag) {
+            return existingTag.taxonomy;
+        });
+
+        addedTags.forEach(function (addTag) {
+            existingTags.indexOf(addTag) === -1 && createdTags.push(addTag)
+        })
+
+        db.tags.update( { taxonomy : { $in : existingTags} }, { $inc : { count : 1 }}, { multi : true }, this);
+    },
+
+    function insertTags(err, skip) {
+        if (skip === 1) return 1;
+        if (err) return next(err);
+        var reformed = createdTags.map(function (createdTag) {
+            return {
+                taxonomy : createdTag,
+                slug     : createdTag.replace(/\s+|\s+$/g,'-'),
+                count    : 1
+            };
+        });
+
+        console.log('reformed : %s', JSON.stringify(reformed));
+
+        if (reformed.length === 0 ) return true;
+        db.tags.insert(reformed, this);
+    },
+
+    function finish (err) {
         if (err) return next(err);
         res.json(200);
     }

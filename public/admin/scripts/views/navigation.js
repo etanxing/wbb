@@ -22,7 +22,7 @@ define([
             this.collection.on('reset', this.render, this);
         },
 
-        render : function(options){
+        render : function(){
             this.$el.html(_.template(navigation)(this.collection.info()));
             return this;
         },
@@ -64,22 +64,45 @@ define([
         },
 
         filter: function (e) {
-            e.preventDefault();
+            e && e.preventDefault();
 
-            var item = e.target,
-                status = $(item).data('status'),
-                type = $(item).data('type'),
+            var rules = [],
+                // Separate search query that supports multi-words
+                words = _.map($('#search-query').val().match(/\w+/ig), function(element) { return element.toLowerCase(); }),
+                // Generate pattern for filtering
+                pattern = '(' + _.uniq(words).join('|') + ')',
+                // Get last selected status
                 laststatus = this.$('.refinestatus a.active').data('status'),
+                // Get last selected type
                 lasttype = this.$('.refinetype a.active').data('type'),
-                rules = [];
+                // e.target
+                item,
+                // Get currect status
+                status,
+                // Get current type
+                type;
 
-            if (status) {
-                rules.push({ field: 'status', type: status === -1 ?'min':'equalTo', value: status },
-                           { field: 'type', type: lasttype === -1 ? 'min':'equalTo', value: lasttype });
-            } else {
+            if (!e) {
+                // Key words search
                 rules.push({ field: 'status', type: laststatus === -1 ?'min':'equalTo', value: laststatus },
-                           { field: 'type', type: type === -1 ? 'min':'equalTo', value: type });
-            }            
+                           { field: 'type', type: lasttype === -1 ? 'min':'equalTo', value: lasttype },
+                           { field: 'title', type: 'pattern', value: new RegExp(pattern, 'igm')});
+            } else {
+                //Filter Status & Type                
+                item = e.target;
+                status = $(item).data('status');
+                type = $(item).data('type');
+
+                if (status) {
+                    rules.push({ field: 'status', type: status === -1 ?'min':'equalTo', value: status },
+                               { field: 'type', type: lasttype === -1 ? 'min':'equalTo', value: lasttype },
+                               { field: 'title', type: 'pattern', value: new RegExp(pattern, 'igm')});
+                } else {
+                    rules.push({ field: 'status', type: laststatus === -1 ?'min':'equalTo', value: laststatus },
+                               { field: 'type', type: type === -1 ? 'min':'equalTo', value: type },
+                               { field: 'title', type: 'pattern', value: new RegExp(pattern, 'igm')});
+                }    
+            }       
             
             this.collection.setFieldFilter(rules);
         }

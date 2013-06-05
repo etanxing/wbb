@@ -1,6 +1,10 @@
 <h1>
     Posts
 </h1>
+<div class="control-group search">
+    <input class="search-query span3" type="text" placeholder="Search..." id="search-query"/>
+    <i class="input-icon icon-search"></i>
+</div>
 <table class="table table-hover postlist">
     <thead>
         <tr>
@@ -20,17 +24,18 @@
                 Tags
             </th>
             <th>
-                Status
-            </th>
-            <th>
                 Date
             </th>
-            <th>
+            <th class="col status">
+                Status
+            </th>
+            <th class="col type">
                 Type
             </th>
         </tr>
     </thead>
     <tbody>
+        <tr><td colspan="7" style="text-align:center;"><i class="icon-spinner icon-spin icon-2x"></i> loading...</td></tr>
     </tbody>
     <tfoot>
         <tr>
@@ -50,12 +55,12 @@
                 Tags
             </th>
             <th>
-                Status
-            </th>
-            <th>
                 Date
             </th>
-            <th>
+            <th class="col status">
+                Status
+            </th>
+            <th class="col type">
                 Type
             </th>
         </tr>

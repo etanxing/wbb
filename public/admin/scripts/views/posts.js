@@ -16,11 +16,12 @@ define([
         className: 'posts-view',
 
         events : {
-            'click .listpost a' : 'post'
+            'click .listpost a' : 'post',
+            'keyup .search-query' : 'search'
         },
 
         initialize: function() {
-            _.bindAll(this, 'addAll', 'addOne', 'renderNavigation');
+            _.bindAll(this, 'addAll', 'addOne', 'renderNavigation', 'search');
             this.listenTo(this.collection, 'reset', this.addAll);
         },
 
@@ -39,9 +40,15 @@ define([
         },
 
         addAll : function() {
-            this.$('.postlist tbody').empty();
+            var info = this.collection.info();
+
+            this.$('.postlist')
+            .toggleClass('status', info.filters[0].value === -1 )
+            .toggleClass('type', info.filters[1].value === -1)
+            .find('tbody').empty();
+
             this.collection.each(this.addOne);
-            this.collection.models.length === 0 && this.$('.postlist tbody').html('<tr><td colspan="7">No posts or pages found.</td></tr>');
+            this.collection.models.length === 0 && this.$('.postlist tbody').html('<tr><td colspan="7" style="text-align:center;">No posts or pages found.</td></tr>');
         },
 
         addOne: function (post) {
@@ -62,6 +69,10 @@ define([
             this.navigationViewUp.remove();
             this.navigationViewDown.remove();
             this.$el.detach();            
+        },
+
+        search : function(e) {
+            this.navigationViewUp.filter();
         },
 
         post : function(e) {
