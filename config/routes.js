@@ -54,14 +54,17 @@ module.exports = function (app, passport) {
     //Add a Post
     app.post('/admin/api/post', admin.usercheck, admin.addpost);
 
-    //Update item's name by id
-    app.put('/api/model', admin.model);
+    //Delete Posts
+    app.delete('/admin/api/posts', admin.usercheck, admin.deleteposts)
 
-    //Update item's fields only changed
-    app.patch('/api/model', admin.model);
+    //Add tags
+    app.post('/admin/api/tags', admin.usercheck, admin.addtags);
 
-    //Add item's name
-    app.post('/api/model', admin.addModel);
+    //Update a tag
+    app.put('/admin/api/tag/:id', admin.usercheck, admin.updatetag);
+
+    //Delete a tag
+    app.delete('/admin/api/tags', admin.usercheck, admin.deletetags);
 
     //Upload file
     app.post('/upload', admin.upload);

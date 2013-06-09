@@ -1,14 +1,16 @@
 <h1>
-    Posts
+    Tags
 </h1>
 <div class="control-group search">
     <input class="search-query span3" type="text" placeholder="Search..." id="search-query"/>
     <i class="input-icon icon-search"></i>
 </div>
 <form class="form-inline pull-left actions">
-    <button type="button" class="btn btn-danger" id="posts-delete">Delete Tags</button>
+    <input class="span3" type="text" placeholder="New tags. e.g. css,html" id="newTags" required/>
+    <button type="submit" class="btn btn-inverse">Add Tags</button>
+    <button type="button" class="btn btn-danger" id="tags-delete">Delete Tags</button>
 </form>
-<table class="table table-hover postlist">
+<table class="table table-hover taglist">
     <thead>
         <tr>
             <th class="checkbox">
@@ -17,54 +19,36 @@
                 <label for="checkallup"></label>
                 </div>
             </th>
-            <th>
-                Title
+            <th class="taxonomy">
+                <a href="#">Taxonomy</a>
             </th>
-            <th>
-                Author
+            <th class="slug">
+                Slug
             </th>
-            <th>
-                Tags
-            </th>
-            <th>
-                Date
-            </th>
-            <th class="col status">
-                Status
-            </th>
-            <th class="col type">
-                Type
+            <th class="count">
+                <a href="#">Count<i class="icon-large icon-chevron-sign-up"></i></a>
             </th>
         </tr>
     </thead>
     <tbody>
-        <tr><td colspan="7" style="text-align:center;"><i class="icon-spinner icon-spin icon-2x"></i> loading...</td></tr>
+        <tr><td colspan="4" style="text-align:center;"><i class="icon-spinner icon-spin icon-2x"></i> loading...</td></tr>
     </tbody>
     <tfoot>
         <tr>
-            <th class="checkbox">
+            <th>
                 <div class="checkbox">
                 <input type="checkbox" value="None" id="checkalldown" />
                 <label for="checkalldown"></label>
                 </div>
             </th>
             <th>
-                Title
+                <a href="#">Taxonomy</a>
             </th>
             <th>
-                Author
+                Slug
             </th>
             <th>
-                Tags
-            </th>
-            <th>
-                Date
-            </th>
-            <th class="col status">
-                Status
-            </th>
-            <th class="col type">
-                Type
+                <a href="#">Count</a>
             </th>
         </tr>
     </tfoot>

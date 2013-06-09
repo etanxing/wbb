@@ -23,7 +23,11 @@ define([
         },
 
         render : function(){
-            this.$el.html(_.template(navigation)(this.collection.info()));
+            this.$el.html(_.template(navigation)({
+                info   : this.collection.info(),
+                filter : this.info
+            }));
+
             return this;
         },
 
@@ -66,44 +70,56 @@ define([
         filter: function (e) {
             e && e.preventDefault();
 
-            var rules = [],
+            var self = this,
+                rules = [],
                 // Separate search query that supports multi-words
                 words = _.map($('#search-query').val().match(/\w+/ig), function(element) { return element.toLowerCase(); }),
                 // Generate pattern for filtering
                 pattern = '(' + _.uniq(words).join('|') + ')',
-                // Get last selected status
-                laststatus = this.$('.refinestatus a.active').data('status'),
-                // Get last selected type
-                lasttype = this.$('.refinetype a.active').data('type'),
+                // Store last selected values
+                lastfilter = {},
+                // Stoe current selected values
+                currentfilter = {},
                 // e.target
                 item,
-                // Get currect status
-                status,
-                // Get current type
-                type;
+                // 
+                fieldname;
 
-            if (!e) {
-                // Key words search
-                rules.push({ field: 'status', type: laststatus === -1 ?'min':'equalTo', value: laststatus },
-                           { field: 'type', type: lasttype === -1 ? 'min':'equalTo', value: lasttype },
-                           { field: 'title', type: 'pattern', value: new RegExp(pattern, 'igm')});
-            } else {
-                //Filter Status & Type                
+            if (this.info) {
+                // Set last selected values
+                _.each(this.info.selects, function (select) {
+                    lastfilter[select.field] = self.$('.select' + select.field + ' a.active').data('item');
+                });
+
+                // Generate current rules
+                _.each(this.info.selects, function (select) {
+                    rules.push({
+                        field : select.field,
+                        type  : lastfilter[select.field] === -1 ?'min':'equalTo',
+                        value : lastfilter[select.field]
+                    })
+                });
+
+                _.each(this.info.textfields, function(textfield) {
+                    rules.push({ field: textfield, type: 'pattern', value: new RegExp(pattern, 'igm')});  
+                });
+            }
+
+            //If it's not a keyword search, update rules
+            if (e) {
+                // Find out which field is clicked               
                 item = e.target;
-                status = $(item).data('status');
-                type = $(item).data('type');
+                fieldname = $(item).parent().data('select');
 
-                if (status) {
-                    rules.push({ field: 'status', type: status === -1 ?'min':'equalTo', value: status },
-                               { field: 'type', type: lasttype === -1 ? 'min':'equalTo', value: lasttype },
-                               { field: 'title', type: 'pattern', value: new RegExp(pattern, 'igm')});
-                } else {
-                    rules.push({ field: 'status', type: laststatus === -1 ?'min':'equalTo', value: laststatus },
-                               { field: 'type', type: type === -1 ? 'min':'equalTo', value: type },
-                               { field: 'title', type: 'pattern', value: new RegExp(pattern, 'igm')});
-                }    
-            }       
-            
+                _.each(rules, function (rule) {
+                    if (rule.field === fieldname) {
+                        rule.value = $(item).data('item');
+                        rule.type = rule.value === -1 ?'min':'equalTo';
+                    }
+                });  
+            }
+ 
+            if (this.info) this.info.filter = rules;
             this.collection.setFieldFilter(rules);
         }
     });

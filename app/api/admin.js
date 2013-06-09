@@ -3,7 +3,8 @@ var Step = require('step'),
     ObjectId  = mongojs.ObjectId,
     config = require('../../config/config').config().db,
     db = mongojs(config.uri, config.collections),
-    moment = require('moment');
+    moment = require('moment'),
+    _ = require('underscore');
 
 //Check User
 exports.usercheck = function (req, res, next) {
@@ -245,24 +246,25 @@ exports.addpost = function (req, res, next) {
         db.posts.insert(newPost, this);
     },
 
-    function findExistingTags(err, post) {
-        if (err) return next(err);
-        if (post.tags.length === 0) return 1;
-        db.tags.find( { taxonomy : { $in : post.tags } }, { taxonomy : 1, _id : 0 }, this);
+    function findExistingTags(err, posts) {
+        if (err || !posts || posts.length !==1 ) return next(err);
+        var tags = posts[0].tags;
+        if (tags.length === 0) return 1;
+        db.tags.find( { taxonomy : { $in : tags } }, { taxonomy : 1, _id : 0 }, this);
     },
 
-    function increaseTags(err, existingTags) {  
+    function increaseTags(err, existingTags) {
         if (existingTags === 1) return 1;
         if (err) return next(err);
-        var existingTags = existingTags.map(function (existingTag) {
+        var existingtags = existingTags.map(function (existingTag) {
             return existingTag.taxonomy;
         });
 
         addedTags.forEach(function (addTag) {
-            existingTags.indexOf(addTag) === -1 && createdTags.push(addTag)
+            existingtags.indexOf(addTag) === -1 && createdTags.push(addTag)
         })
 
-        db.tags.update( { taxonomy : { $in : existingTags} }, { $inc : { count : 1 }}, { multi : true }, this);
+        db.tags.update( { taxonomy : { $in : existingtags} }, { $inc : { count : 1 }}, { multi : true }, this);
     },
 
     function insertTags(err, skip) {
@@ -289,20 +291,122 @@ exports.addpost = function (req, res, next) {
     )
 }
 
-//Update item's name by id
-exports.model = function (req, res, next) {
-    console.log('body : %s', JSON.stringify(req.body));
-    var id = req.body._id;
-    delete req.body._id;
-    db.DataBupa.update({ _id : new ObjectId(id)}, 
-                      {$set : req.body}, 
-                      function(err) {
-        // the update completed
-        if (err) return next(err);
-        console.log('Updated.')
-        res.send(200);
-    });    
+//Delete Posts
+exports.deleteposts = function(req, res, next) {
+    var ids = _.clone(req.body.ids || []),
+        objids = _.map(ids, function (id) {
+            return new ObjectId(id);
+        }),
+        removedTags = [];
+
+    Step(
+        function findTags() {
+            db.posts.find({ _id : { $in : objids}}, { _id:0, tags: 1 }, this);
+        },
+
+        function deletePosts(err, posts){
+            if (err) return next(err);
+            _.each(posts, function (post){
+                _.each(post.tags, function (tag) {
+                    removedTags.indexOf(tag) === -1 && removedTags.push(tag);
+                })
+            });
+            console.log('removedTags: %s', removedTags);
+            db.posts.remove({ _id : { $in : objids}}, this);
+        },
+
+        function decreaseTags(err) {
+            if (err) return next(err);            
+            db.tags.update( { taxonomy : { $in : removedTags} }, { $inc : { count : -1 }}, { multi : true }, function (err) {
+                if (err) return next(err);
+                res.json(ids);
+            });
+        }
+    )
+}
+
+//Add tags
+exports.addtags = function (req, res, next) {
+    var newtags = req.body.newtags || [];
+        addedTags = newtags.map(function (newtag) {
+        return _.isString(newtag)?newtag.replace(/^\s+|\s+$/g,''):''; 
+    });
+
+    Step(
+        function findExistingTags() {
+            db.tags.find( { taxonomy : { $in : addedTags } }, { taxonomy : 1, _id : 0 }, this);
+        },
+
+        function insertTags(err, existingTags) {
+            if (err) return next(err);
+            var existingtags = existingTags.map(function (existingTag) {
+                    return existingTag.taxonomy;
+                }),
+
+                createdTags = addedTags.filter(function (newtag) {
+                    return existingtags.indexOf(newtag) === -1;
+                });
+
+            addedTags = createdTags.map(function (createdTag) {
+                return {
+                    taxonomy : createdTag,
+                    slug     : createdTag.replace(/\s+|\s+$/g,'-'),
+                    count    : 1
+                };
+            });
+
+            if (addedTags.length === 0 ) return true;
+            db.tags.insert(addedTags, this);
+        },
+
+        function finish (err) {
+            if (err) return next(err);
+            res.json(addedTags);
+        }
+    ) 
 };
+
+//Update a tag
+exports.updatetag = function (req, res, next) {
+    var data = req.body;
+    console.log('date: %s', data);
+    db.tags.update({ _id : new ObjectId(data._id)}, 
+                   { $set : { taxonomy : data.taxonomy , slug: data.slug.replace(/\s+|\s+$/g,'-') }}, 
+                   function (err) {
+        if (err) return next(err);
+        res.json(200);
+    })
+};
+
+//Delete tags
+exports.deletetags = function (req, res, next) {
+    var ids = _.clone(req.body.ids || []),
+        objids = _.map(ids, function (id) {
+            return new ObjectId(id);
+        });
+
+    Step(
+        function findTags(){
+            db.tags.find({ _id : { $in : objids} }, { _id: 0, taxonomy : 1}, this)
+        },
+
+        function findPosts(err, tags) {
+            if (err || tags.length === 0) return next(err);
+            var tags = _.map(tags, function(tag) { return tag.taxonomy; });
+            console.log('tags: %s', tags);
+            db.posts.update({}, { $pullAll : { tags: tags}}, { multi : true }, this)
+        },
+
+        function removeTags (err) {
+            if (err) return next(err);
+            db.tags.remove({ _id : { $in : objids} }, function (err, result) {
+                if (err) return next(err);
+                console.log('result: %s', result);
+                res.json(ids);
+            })
+        }
+    )
+}
 
 //Add item's name
 exports.addModel = function (req, res, next) {

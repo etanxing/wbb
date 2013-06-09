@@ -12,14 +12,16 @@ define([
     '../views/dashboard',
     '../views/posts',
     '../views/post',
-    '../views/sidemenu'
-], function ($, Backbone, Common, Post, Posts, Settings, Tags, LoginView, DashboardView, PostsView, PostView, SidemenuView) {
+    '../views/sidemenu',
+    '../views/tags'
+], function ($, Backbone, Common, Post, Posts, Settings, Tags, LoginView, DashboardView, PostsView, PostView, SidemenuView, TagsView) {
     'use strict';
 
     var Router = Backbone.Router.extend({
     	initialize : function() {
             this.data = {
                 posts : new Posts(),
+                tags: new Tags(),
                 settings : new Settings()
             }
 
@@ -28,7 +30,8 @@ define([
                 sidemenu : new SidemenuView(),
                 dashboard : new DashboardView(),
                 posts : new PostsView({collection : this.data.posts}),
-                post : new PostView()
+                post : new PostView(),
+                tags : new TagsView({collection : this.data.tags })
     		}
 
             this.view = undefined;
@@ -49,6 +52,7 @@ define([
             'admin/dashboard' : 'dashboard',
             'admin/posts'     : 'posts',
             'admin/post(/:id)': 'post', 
+            'admin/tags'      : 'tags',
             '*path'           : 'page404'
         },
 
@@ -66,6 +70,10 @@ define([
 
         post : function(id) {
             this.setBody('post', id, true);
+        },
+
+        tags : function() {
+            this.setBody('tags', true);
         },
 
         page404: function() {

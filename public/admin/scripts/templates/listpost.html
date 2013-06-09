@@ -1,12 +1,18 @@
-<th>
+<th class="col checkbox">
 	<div class="checkbox">
-  	<input type="checkbox" value="None" id="check<%=post._id%>" />
-	<label for="check<%=post._id%>"></label>
+  	<input type="checkbox" value="None" id="<%=post._id%>" />
+	<label for="<%=post._id%>"></label>
 	</div>
 </th>
-<td><a href="post/<%=post._id %>"><%=post.title %></a></td>
-<td><%=post.author.name %></td>
-<td><%=post.tags.join(', ') %></td>
-<td><%=moment(post.date, 'YYYY-MM-DDTHH:mm:ss Z').format('DD/MM/YYYY hh:mm A') %></td>
+<td class="col title">
+	<a href="post/<%=post._id %>"><b><%=post.title %></b></a>
+	<nav class="operations">
+		<a href="post/<%=post._id %>" class="post-edit" >Edit</a> |
+		<a href="#" class="post-delete" data-id="<%=post._id%>">Delete</a>
+	</nav>
+</td>
+<td class="col name"><%=post.author.name %></td>
+<td class="col tags"><%=post.tags.join(', ') %></td>
+<td class="col date"><%=moment(post.date, 'YYYY-MM-DDTHH:mm:ss Z').format('DD/MM/YYYY hh:mm A') %></td>
 <td class="col status"><%=status[post.status - 1]%></td>
 <td class="col type"><%=type[post.type -1 ]%></td>

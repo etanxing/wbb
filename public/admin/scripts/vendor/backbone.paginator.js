@@ -33,7 +33,7 @@ define([
       sortColumn: "",
       sortDirection: "desc",
       lastSortColumn: "",
-      fieldFilterRules: [{value:-1, field: 'status', type: 'min'},{value:1, field:'type', type:'equalTo'}],
+      fieldFilterRules: [],
       lastFieldFilterRules: [],
       filterFields: "",
       filterExpression: "",
@@ -688,8 +688,7 @@ define([
           previous: false,
           next: false,
           startRecord: totalRecords === 0 ? 0 : (self.currentPage - 1) * this.perPage + 1,
-          endRecord: Math.min(totalRecords, self.currentPage * this.perPage),
-          filters : self.fieldFilterRules
+          endRecord: Math.min(totalRecords, self.currentPage * this.perPage)
         };
 
         if (self.currentPage > 1) {

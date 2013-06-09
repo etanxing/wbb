@@ -9,11 +9,6 @@ define([
 ], function (_, Backbone, Post, Common) {
     'use strict';
 
-    // var Posts = Backbone.Collection.extend({
-    //     model: Post,
-    //     url : 'http://localhost:7777/api/items'
-    // });
-
 	var Posts = Backbone.Paginator.clientPager.extend({
 		model : Post,
 		paginator_core: {

@@ -22,6 +22,22 @@ define([
             'password':''
         },
 
+        info: function() {
+            var info = {
+                textfields: ['title'],
+
+                selects : [{ field : 'type', data : [['All', -1],['Post', 1], ['Page', 2]] }, 
+                           { field : 'status', data: [['All', -1],['Published', 1], ['Password', 2], ['Draft', 3]] }],
+                filter : [
+                    //default filter
+                    {field: 'status', type: 'min', value: -1 },
+                    {field: 'type', type:'equalTo', value: 1 },
+                    {field: 'title', type: 'pattern', value: new RegExp('', 'igm')}],
+            }
+
+            return info;
+        },
+
         validations : {
             title   : {
                 required : true

@@ -105,8 +105,7 @@ module.exports = function (app, config, passport) {
         // error Handler
         app.use(function(err, req, res, next){
             console.error('FINAL Error logged: %s', err.message);
-            res.status(500);
-            res.json('error', { error: err });
+            res.redirect(301, '/admin/error');
         })
     })
 }

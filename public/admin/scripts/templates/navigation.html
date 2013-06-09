@@ -1,39 +1,38 @@
+<% if (filter && filter.selects.length > 0) { %>
 <div class="refine btn-toolbar pull-left">
-	<div class="refinetype btn-group">
-		<% _.each([['All', -1],['Post', 1], ['Page', 2]], function(type) { %>
-		<a class="btn btn-primary <%=filters[1].value === type[1] ? 'active':''%>" href="#" 
-			data-type="<%=type[1]%>"><%=type[0]%></a>
+	<% _.each(filter.selects, function(select) { %>
+	<div class="select<%=select.field%> btn-group" data-select="<%=select.field%>">
+		<% var selectedvalue = (_.find(filter.filter, function(filter) { return filter.field === select.field})).value;
+		   _.each(select.data, function(item) { %>
+		<a class="btn btn-primary <%=selectedvalue === item[1] ? 'active':''%>" href="#" 
+			data-item="<%=item[1]%>"><%=item[0]%></a>
 		<% })%>
 	</div>
-	<div class="refinestatus btn-group">
-		<% _.each([['All', -1],['Published', 1], ['Password', 2], ['Draft', 3]], function(status) { %>
-		<a class="btn btn-primary <%=filters[0].value === status[1] ? 'active':''%>" href="#" 
-			data-status="<%=status[1]%>"><%=status[0]%></a>
-		<% })%>
-	</div>
+	<% }) %>
 </div>
+<% } %>
 <div class="btn-toolbar pull-right">
 	<div class="pagination btn-group">
-		<% if (totalPages > 1 && pageSet.length > 0 ) {%>
+		<% if (info.totalPages > 1 && info.pageSet.length > 0 ) {%>
 		<ul>
-			<% if (totalPages > 1) { %>
+			<% if (info.totalPages > 1) { %>
 			<li class="previous"><a href="#" class="icon-angle-left"></a></li>
 			<% } %>
-			<% _.each (pageSet, function (p) { %>
-			<% if (currentPage == p) { %>
+			<% _.each (info.pageSet, function (p) { %>
+			<% if (info.currentPage == p) { %>
 				<li class="page active"><a href="#"><%= p %></a></li>
 			<% } else { %>
 				<li><a href="#" class="page"><%= p %></a></li>
 			<% } %>
 			<% }); %>
-			<% if (totalPages > 1) { %>
+			<% if (info.totalPages > 1) { %>
 			<li class="next"><a href="#" class="icon-angle-right"></a></li>
 			<% } %>
 		</ul>
 		<% } else { print('<ul></ul>')} %>
-		<% if (totalRecords > 0) { %>
+		<% if (info.totalRecords > 0) { %>
 		<div class="records">
-			<span class="label"><%= startRecord %> - <%= endRecord %> of <%= totalRecords %></span>
+			<span class="label"><%= info.startRecord %> - <%= info.endRecord %> of <%= info.totalRecords %></span>
 		</div>
 		<% } %>
 	</div>
@@ -41,7 +40,7 @@
 <div class="btn-toolbar pull-right">
 	<div class="howmany btn-group">
 		<% _.each([10,20,50], function(perpage) { %>
-		<a class="btn btn-primary <%=perPage === perpage?'active':''%>" href="#"><%=perpage%></a>
+		<a class="btn btn-primary <%=info.perPage === perpage?'active':''%>" href="#"><%=perpage%></a>
 		<% })%>
 	</div>
 </div>

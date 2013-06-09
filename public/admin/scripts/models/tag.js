@@ -9,8 +9,23 @@ define([
 
     var Tag = Backbone.Model.extend({
         idAttribute: "_id",
-        url : function() {
-        	return Common.server + 'api/item/slug/' + this.get('slug')
+
+        defaults: {
+            'taxonomy'  : '',
+            'slug'   : '',
+            'count'   : 1
+        },
+
+        urlRoot : function() {
+            return Common.server + '/admin/api/tag';
+        },
+        info : function() {
+            return { selects : [], 
+                     filter : [], 
+                     textfields: ['taxonomy'],
+                     sortby : 'count',
+                     direct : 'desc'
+            };
         }
     });
 

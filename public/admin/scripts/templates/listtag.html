@@ -1,0 +1,26 @@
+<% if (edit) { %>
+<td colspan="4">
+	<form class="form-inline">
+	<input class="span3" type="text" placeholder="Taxonomy" value="<%=tag.taxonomy %>" required/>
+	<input class="span3" type="text" placeholder="Slug" value="<%=tag.slug %>" required/>
+	<button type="submit" class="btn btn-primary">Update</button>
+	<button type="button" class="btn" id="tag-edit-cancel">Cancel</button>
+	</form>	
+</td>
+<% } else { %>
+<th class="col checkbox">
+	<div class="checkbox">
+  	<input type="checkbox" value="None" id="<%=tag._id%>" />
+	<label for="<%=tag._id%>"></label>
+	</div>
+</th>
+<td class="col taxonomy">
+	<b><a href="#"><%=tag.taxonomy %></a></b>
+	<nav class="operations">
+		<a href="#" class="tag-edit" >Edit</a> |
+		<a href="#" class="tag-delete" data-id="<%=tag._id%>">Delete</a>
+	</nav>
+</td>
+<td class="col slug"><%=tag.slug %></td>
+<td class="col count"><%=tag.count %></td>
+<% } %>
