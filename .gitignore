@@ -1,6 +1,6 @@
 node_modules
 public/.tmp
-public/admin/bower_components
+public/admin/
 lib-cov
 *.seed
 *.log
