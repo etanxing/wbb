@@ -16,8 +16,8 @@ define([
         render: function() {
             this.$el.html(_.template(listpost)({
                 post  : this.model.toJSON(),
-                status: ['Published', 'Password', 'Draft'],
-                type  : ['Post', 'Page']
+                type  : this.model.info('type'),
+                status: this.model.info('status')
             }))
 
             return this;

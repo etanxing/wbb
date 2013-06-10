@@ -1,0 +1,16 @@
+<th class="col checkbox">
+	<div class="checkbox">
+  	<input type="checkbox" value="None" id="<%=setting._id%>" />
+	<label for="<%=setting._id%>"></label>
+	</div>
+</th>
+<td class="col name">
+	<a href="setting/<%=setting._id %>"><b><%=setting.name %></b></a>
+	<nav class="operations">
+		<a href="setting/<%=setting._id %>" class="setting-edit" >Edit</a> |
+		<a href="#" class="setting-delete" data-id="<%=setting._id%>">Delete</a>
+	</nav>
+</td>
+<td class="col value"><%=setting.value %></td>
+<td class="col system"><%=onload[setting.system - 1 ] %></td>
+<td class="col onload"><%=system[setting.onload - 1] %></td>

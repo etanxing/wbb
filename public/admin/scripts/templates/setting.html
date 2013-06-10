@@ -1,0 +1,32 @@
+<h1><%=isNew? 'Add New' : 'Edit' %> Setting</h1>
+<form>
+    <div class="row-fluid">
+        <div class="span9 " >
+            <div class="control-group">
+                <input type="text" placeholder="Enter name here" id="name" required>
+            </div>
+            <div class="control-group">
+                <input type="text" placeholder="Enter value here" id="value" required>                
+            </div>
+            <div class="control-group">
+                <button type="submit" class="btn btn-large btn-primary"><%=isNew? 'Add' : 'Update'%></button>
+            </div>
+        </div>
+        <div class="span3 secondary">
+            <div class="control-group">
+                <label for="onload">Onload</label>
+                <div class="checkbox-slide">  
+                    <input type="checkbox" name="check" name="onload" id="onload" />
+                    <label for="onload"></label>
+                </div>
+            </div>     
+            <div class="control-group">
+                <label for="system">System</label>
+                <div class="checkbox-slide">  
+                    <input type="checkbox" name="check" name="system" id="system" />
+                    <label for="system"></label>
+                </div>             
+            </div>
+        </div>
+    </div>
+</form>

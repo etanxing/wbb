@@ -5,36 +5,33 @@ define([
     'underscore',
     'backbone',    
     '../common',
-    '../views/listtag',
+    '../views/listsetting',
     '../views/navigation',
-    'text!../templates/tags.html',
+    'text!../templates/settings.html',
     'humane'
-], function ($, _, Backbone, Common, ListTagView, NavigationView, tags, humane) {
+], function ($, _, Backbone, Common, ListSettingView, NavigationView, settings, humane) {
     'use strict';
 
-    var TagsView = Backbone.View.extend({        
-        className: 'tags-view',
+    var SettingsView = Backbone.View.extend({        
+        className: 'settings-view',
 
         events : {
-            'click .listtag a'    : 'tag',
+            'click .listsetting a' : 'setting',
             'keyup .search-query' : 'search',
-            'submit .actions'     : 'addTags',
-            'click th a'          : 'sortby',
             'change #checkallup'  : 'checkall',
             'change #checkalldown': 'checkall',
             'change th.checkbox input' : 'toggleDelete',
-            'click .tag-delete'   : 'deleteTags',
-            'click #tags-delete'  : 'deleteTags'
+            'click .setting-delete'   : 'deleteSettings',
+            'click #settings-delete'  : 'deleteSettings'
         },
 
         initialize: function() {
-            _.bindAll(this, 'addAll', 'addOne', 'renderNavigation', 'search', 'addModeltoCollection', 
-                'sortby', 'checkall', 'removeModelfromCollection');
+            _.bindAll(this, 'addAll', 'addOne', 'renderNavigation', 'search', 'checkall', 'removeModelfromCollection');
             this.listenTo(this.collection, 'reset', this.addAll);
         },
 
         render : function() {           
-            this.$el.html(tags);
+            this.$el.html(settings);
             this.collection.fetch({
                 success: this.renderNavigation,
                 silent:true,
@@ -48,29 +45,31 @@ define([
         },
 
         addAll : function() {
-            this.$('#tags-delete').toggle(false);
-            this.$('.taglist')
+            var info = this.collection.info();
+            this.$('#settings-delete').toggle(false);
+            this.$('.settinglist')
+            //.toggleClass('status', info.filters[0].value === -1 )
+            //.toggleClass('type', info.filters[1].value === -1)
             .find('tbody').empty();
 
             this.collection.each(this.addOne);
-            this.collection.models.length === 0 && this.$('.taglist tbody').html('<tr><td colspan="4" style="text-align:center;">No tags found.</td></tr>');
+            this.collection.models.length === 0 && this.$('.settinglist tbody').html('<tr><td colspan="7" style="text-align:center;">No settings found.</td></tr>');
         },
 
-        addOne: function (tag) {
-            var view = new ListTagView({model:tag});
-            this.$('.taglist tbody').append(view.render().$el);
+        addOne: function (setting) {
+            var view = new ListSettingView({model:setting});
+            this.$('.settinglist tbody').append(view.render().el);
         },
 
-        renderNavigation : function () {          
+        renderNavigation : function () {
             var info = (new this.collection.model).info();
             this.collection.setFieldFilter(info.filter);
-            //this.collection.setSort(info.sortby, info.direct);              
             this.navigationViewUp = new NavigationView({collection : this.collection, className : 'navigation up'}),
             this.navigationViewDown = new NavigationView({collection : this.collection, className : 'navigation down'});
             this.navigationViewUp.info = this.navigationViewDown.info = info;
             this.$('.actions')
             .before(this.navigationViewUp.render().el);
-            this.$('.taglist')
+            this.$('.settinglist')
             .after(this.navigationViewDown.render().el);                
         },
 
@@ -84,53 +83,24 @@ define([
             this.navigationViewUp.filter();
         },
 
-        tag : function(e) {
+        setting : function(e) {
             Backbone.history.navigate(e.target.pathname, true);
             return false;
         },
 
-        addTags : function(e) {
-            humane.log('Adding tags');
-            e.preventDefault();
-            var newtags = this.$('#newTags').val().split(',');
-            $.ajax({
-                type : 'post',
-                url : '/admin/api/tags', 
-                data : { newtags : _.map(newtags, function (newtag) {
-                    return newtag.replace(/^\s+|\s+$/g,'');
-                })},
-                success : this.addModeltoCollection,
-                error : this.errorhandler
-            })
-        },
-        
-        addModeltoCollection: function(newtags) {
-            this.$('#newTags').val('');
-            humane.log('Successfully add');
-            this.collection.add(newtags);
-            this.collection.pager();
+        checkall : function (e) {
+            var checked = e.target.checked;
+            this.$('.checkbox input:' + (checked?'not(:checked)':'checked')).map(function() {
+                return this.checked = checked;
+            })        
         },
 
-        sortby : function(e) {
-            var item = e.target.tagName === 'A'? e.target : e.target.parentNode,
-                col = $(item).text().toLowerCase(),
-                reverse = $(item).has('i').length === 1,
-                updirection = $(item).children().hasClass('icon-chevron-sign-up');
-
-            if (reverse) {
-                $(item).children()
-                .toggleClass('icon-chevron-sign-up', !updirection)
-                .toggleClass('icon-chevron-sign-down', updirection);                
-            } else {
-                $(item).append('<i class="icon-large icon-chevron-sign-up"></i>');
-                $(item).parent().siblings().find('i').remove();
-            }
-
-            this.collection.setSort(col, updirection ?'asc':'desc');
+        toggleDelete : function (e) {
+            this.$('#settings-delete').toggle(this.$('tbody .checkbox input:checked').length > 0);
         },
 
-        deleteTags : function(e) {            
-            var mutli = e.target.id === 'tags-delete',
+        deleteSettings : function(e) {            
+            var mutli = e.target.id === 'settings-delete',
                 tobedeletedIDs = [],
                 self = this,
                 r=confirm('You are about to permanently delete the selected items.\n\'Cancel\' to stop, \'OK\' to delete.');
@@ -146,7 +116,7 @@ define([
 
                 $.ajax({
                     type : 'delete',
-                    url : '/admin/api/tags', 
+                    url : '/admin/api/settings', 
                     data : { ids : tobedeletedIDs },
                     success : this.removeModelfromCollection,
                     error : this.errorhandler
@@ -167,17 +137,6 @@ define([
             humane.log('Successfully deleted.');
         },
 
-        checkall : function (e) {
-            var checked = e.target.checked;
-            this.$('.checkbox input:' + (checked?'not(:checked)':'checked')).map(function() {
-                return this.checked = checked;
-            })        
-        },
-
-        toggleDelete : function (e) {
-            this.$('#tags-delete').toggle(this.$('tbody .checkbox input:checked').length > 0);
-        },
-
         errorhandler : function (resp) {
             var err;
             try {
@@ -190,5 +149,5 @@ define([
         }
     });
 
-    return TagsView;
+    return SettingsView;
 });

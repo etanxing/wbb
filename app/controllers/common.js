@@ -11,16 +11,10 @@ exports.all = function (req, res, next) {
 }
 
 exports.getall = function (req, res, next) {
-
+    console.log('Get all: %s', req.url);
     //Don't process requests for API endpoints
-    if (req.url.indexOf('/api') == 0 || req.url.indexOf('/admin/api') == 0 ) return next();
-    
-    var init = 'var user = user || {}';
-    fs.readFile(path + '/public/admin/index.html', 'utf8', function(error, content) {        
-        if (error) console.log(error);
-        if (req.isAuthenticated()) init = 'var user = user || { id : "' + req.user._id + '"}';
-        res.send(200, content.replace("{{init}}", init));        
-    });
+    if (req.url.indexOf('/api') == 0 || req.url.indexOf('/admin/api') == 0 ) return next();   
+    res.render('index', { userid: req.isAuthenticated()?req.user._id:undefined });
 }
 
 exports.optionsall = function(req, res, next) {

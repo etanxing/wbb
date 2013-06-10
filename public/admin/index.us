@@ -34,7 +34,7 @@
             g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
             s.parentNode.insertBefore(g,s)}(document,'script'));
         </script>
-        <script type="text/javascript">{{init}}</script>
+        <script type="text/javascript">var user = user || { <% print(userid?'id : \'' + userid + '\'':'');%>}</script>
         <!-- build:js scripts/main.js -->        
         <script data-main="scripts/main" src="bower_components/requirejs/require.js"></script>
         <!-- endbuild -->

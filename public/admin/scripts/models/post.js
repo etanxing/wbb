@@ -22,7 +22,7 @@ define([
             'password':''
         },
 
-        info: function() {
+        info: function(selectname) {
             var info = {
                 textfields: ['title'],
 
@@ -34,6 +34,8 @@ define([
                     {field: 'type', type:'equalTo', value: 1 },
                     {field: 'title', type: 'pattern', value: new RegExp('', 'igm')}],
             }
+
+            if (selectname) return _.find(info.selects, function(select) { return select.field === selectname}).data;
 
             return info;
         },

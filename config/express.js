@@ -6,7 +6,8 @@ var express = require('express'),
     fs = require('fs'),
     flash = require('connect-flash'),
     mongoStore = require('connect-mongo')(express),
-    log4js = require('log4js/lib/log4js');
+    log4js = require('log4js/lib/log4js'),
+    _ = require('underscore');
 
 module.exports = function (app, config, passport) {
 
@@ -26,8 +27,25 @@ module.exports = function (app, config, passport) {
     app.use(express.bodyParser({ keepExtensions: true, uploadDir: './upload' }))
     app.use(express.methodOverride())
 
+    app.use('/admin/setting', express.static(config.root + '/public/admin'));
+    app.use('/admin/post', express.static(config.root + '/public/admin'));
     app.use('/admin', express.static(config.root + '/public/admin'));
-    app.use('/admin/post', express.static(config.root + '/public/admin'))
+
+    // set views path, template engine and default layout
+    app.engine('us', function(path, options, fn){
+        fs.readFile(path, 'utf8', function(err, str){
+            if (err) return fn(err);
+            try {
+                var tmpl = _.template(str, null, options);
+                fn(null, tmpl(options).replace(/\n$/, ''));
+            } catch(err) {
+                fn(err);
+            }
+        });
+    })
+
+    app.set('views', config.root + '/public/admin')
+    app.set('view engine', 'us')
 
     // production only
     app.configure('production', function(){

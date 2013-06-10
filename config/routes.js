@@ -66,6 +66,15 @@ module.exports = function (app, passport) {
     //Delete a tag
     app.delete('/admin/api/tags', admin.usercheck, admin.deletetags);
 
+    //Update a setting
+    app.put('/admin/api/setting/:id', admin.usercheck, admin.updatesetting);
+
+    //Add a setting
+    app.post('/admin/api/setting', admin.usercheck, admin.addsetting);
+
+    //Get a setting
+    app.get('/admin/api/setting/:id?', admin.usercheck, admin.setting);
+
     //Upload file
     app.post('/upload', admin.upload);
 

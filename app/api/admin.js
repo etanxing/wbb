@@ -408,6 +408,34 @@ exports.deletetags = function (req, res, next) {
     )
 }
 
+//Update a setting
+exports.updatesetting = function (req, res, next) {
+    var data = req.body,
+        id = new ObjectId(data._id);
+
+    delete data._id;
+    db.options.update({ _id : id}, { $set : data}, function (err) {
+        if (err) return next(err);
+        res.json(200);
+    })
+}
+
+//Add a setting
+exports.addsetting= function(req, res, next) {
+    db.options.insert(req.body, function(err) {
+        if (err) return next(err);
+        res.json(200);
+    });
+}
+
+//Get a setting
+exports.setting = function(req, res, next) {
+    db.options.findOne({ _id : new ObjectId(req.params.id) }, function(err, setting) {
+        if (err) return next(err);
+        res.json(setting);
+    })
+}
+
 //Add item's name
 exports.addModel = function (req, res, next) {
     console.log('body : %s', JSON.stringify(req.body));
