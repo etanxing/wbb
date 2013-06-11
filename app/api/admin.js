@@ -86,153 +86,170 @@ exports.updatepost = function (req, res, next) {
         3. Store new tags string for later use
         4. Prepare for updated data
     */
-    var now = moment(),
-        id = new ObjectId(req.body._id),
-        tags = req.body.tags.map(function(tag) { return tag.replace(/^\s+|\s+$/g,''); }),
-        data = req.body;
 
-    delete data._id;
-    delete data.author;
-    delete data.tags;
-    data.date = moment(data.date, 'DD/MM/YYYY hh:mm A').format('YYYY-MM-DDTHH:mm:ss Z');
-    data.date_gmt = moment(data.date, 'DD/MM/YYYY hh:mm A').utc().format('YYYY-MM-DDTHH:mm:ss Z');
-    data.modified = now.format();
-    data.modified_gmt = now.utc().format();
+    var newTags = req.body.tags.map(function(tag) { return tag.replace(/^\s+|\s+$/g,''); }),
+        id = new ObjectId(req.body._id),
+        postTags = [];
 
     //console.log('data : %s', JSON.stringify(data));
     Step(
         function findOldTags() {
-            db.posts.finOne({ _id : id}, { tags : 1, _id : 0 }, this)
+            console.log('findOldTags');
+            db.posts.findOne({ _id : id}, { tags : 1, _id : 0 }, this)
         },
 
         function decreaseTags(err, post) {
+            console.log('decreaseTags');
             if (err) return next(err);
             if (!post) return next(new Error('Post not found'));
+            //If there are no tags with the post, then skip
             if (post.tags.length === 0 ) return true;
             var oldtags = post.tags.map(function(tag) { return tag.taxonomy; });
             db.tags.update( { taxonomy : { $in : oldtags} }, { $inc : { count : -1 }}, { multi : true }, this);
         },
 
         function increaseTags(err) {
-            if (err && !_.isBoolean_(err)) return next(err);
-            if (tags.length === 0 ) return true;
+            console.log('increaseTags');
+            if (err && !_.isBoolean(err)) return next(err);
+            //If there are no tags with the post, then skip
+            if (newTags.length === 0 ) return true;
             db.tags.findAndModify( { 
-                query  : { taxonomy : { $in : tags } }, 
+                query  : { taxonomy : { $in : newTags } }, 
                 update : { $inc : { count : 1 }},
-                fields : { taxonomy : 1, _id: 0}} ,  this);
+                fields : { taxonomy : 1, slug: 1, count:1, _id: 0}} ,  this);
         },
 
-        function  addTags(err, existingTags) {
-            if (err && !_.isBoolean_(err)) return next(err);
-            if (err || existingTags.length === 0) return true;
-            var newTags = tags.map(function(tag) {
-                return existingTags.filter(function(existingTag) {
-                    return existingTag.taxonomy === tag
-                }).length === 0
-            });
+        function addTags(err, tags) {
+            console.log('addTags');
+            if (err && !_.isBoolean(err)) return next(err);
+            if (err || tags.length === 0) return true;
+            var existingTags = tags.map(function(tag) {
+                    postTags.push(tag);
+                    return tag.taxonomy; 
+                }),
+                addedTags = _.difference(newTags, existingTags);
 
-            if (newTags.length === 0) return true;
-            newTags = newTags.map(function(tag) {
-                return {
+            if (addedTags.length === 0) return true;
+
+            addedTags = addedTags.map(function(tag) {
+                var _tag = {
                     taxonomy : tag,
                     slug : tag.replace(/\s+|\s+$/g,'-'),
                     count : 1
-                }
+                };
+
+                postTags.push(_tag);
+                return _tag;
             });
 
-            db.tags.insert(newTags, this);
+            db.tags.insert(addedTags, this);
         },
 
         function updatePost (err) {
-            if (err && !_.isBoolean_(err)) return next(err);
-        }
-        )
+            console.log('updatePost');
+            if (err && !_.isBoolean(err)) return next(err);
+            var now = moment(),                
+                data = _.pick(req.body, 'title', 'slug', 'content', 'status', 'type', 'date', 'password');
 
-    db.posts.findAndModify({
-        query  : { _id : id }, 
-        update : { $set : data }
-    }, function(err, post) {
-        if (err || !post) return next(err);
-        //Compare tags
-        var removedTags = [],
-            addedTags = [],
-            createdTags = [],
-            newTags = tags.length?tags.split(','):[];
-
-        post.tags.forEach(function (tag) {
-            //If tag doesn't exist in new tags, remove it
-            if (newTags.indexOf(tag.t) === -1) removedTags.push(tag);
-        });
-
-        newTags.forEach(function (tag) {
-            //if tag doesn't exist in old tags, add it
-            if (post.tags.filter(function(oldtag) { return oldtag.t === tag; }).length === 0 ) addedTags.push(tag);
-        });
-
-        /*
-            1. Increments -1 of count of removeTags
-            2. Increments 1 of count of addedTags
-            3. Update tags of post
-        */
-
-        Step(
-        function decreaseTags() {
-            if (removedTags.length === 0) return 1;
-            db.tags.update( { taxonomy : { $in : removedTags} }, { $inc : { count : -1 }}, { multi : true }, this);
+            data.date = moment(data.date, 'DD/MM/YYYY hh:mm A').format('YYYY-MM-DDTHH:mm:ss Z');
+            data.date_gmt = moment(data.date, 'DD/MM/YYYY hh:mm A').utc().format('YYYY-MM-DDTHH:mm:ss Z');
+            data.modified = now.format();
+            data.modified_gmt = now.utc().format();
+            data.tags = postTags;
+            db.posts.update({ _id : id }, { $set : data}, this);
         },
 
-        function findExistingTags(err) {
-            if (err) return next(err);
-            if (addedTags.length === 0) return 1;
-            db.tags.find( { taxonomy : { $in : addedTags } }, { taxonomy : 1, _id : 0 }, this);
-        },
-
-        function increaseTags(err, existingTags) {  
-            if (existingTags === 1) return 1;
-            if (err) return next(err);
-            var existingTags = existingTags.map(function (existingTag) {
-                return existingTag.taxonomy;
-            });
-
-            addedTags.forEach(function (addTag) {
-                existingTags.indexOf(addTag) === -1 && createdTags.push(addTag)
-            })
-
-            db.tags.update( { taxonomy : { $in : existingTags} }, { $inc : { count : 1 }}, { multi : true }, this);
-        },
-
-        function insertTags(err, skip) {
-            if (skip === 1) return 1;
-            if (err) return next(err);
-            var reformed = createdTags.map(function (createdTag) {
-                return {
-                    taxonomy : createdTag,
-                    slug     : createdTag.replace(/\s+|\s+$/g,'-'),
-                    count    : 1
-                };
-            });
-
-            console.log('reformed : %s', JSON.stringify(reformed));
-
-            if (reformed.length === 0 ) return true;
-            db.tags.insert(reformed, this);
-        },
-
-        function updateTags(err, skip) {
-            if (err) return next(err);
-            db.posts.update({ _id : id }, { $set: { tags : newTags }}, this)
-        },
-
-        function complete(err) {
+        function finish (err) {
+            console.log('finish');
             if (err) return next(err);
             res.json(200);
         }
         )
 
+    // db.posts.findAndModify({
+    //     query  : { _id : id }, 
+    //     update : { $set : data }
+    // }, function(err, post) {
+    //     if (err || !post) return next(err);
+    //     //Compare tags
+    //     var removedTags = [],
+    //         addedTags = [],
+    //         createdTags = [],
+    //         newTags = tags.length?tags.split(','):[];
+
+    //     post.tags.forEach(function (tag) {
+    //         //If tag doesn't exist in new tags, remove it
+    //         if (newTags.indexOf(tag.t) === -1) removedTags.push(tag);
+    //     });
+
+    //     newTags.forEach(function (tag) {
+    //         //if tag doesn't exist in old tags, add it
+    //         if (post.tags.filter(function(oldtag) { return oldtag.t === tag; }).length === 0 ) addedTags.push(tag);
+    //     });
+
+    //     /*
+    //         1. Increments -1 of count of removeTags
+    //         2. Increments 1 of count of addedTags
+    //         3. Update tags of post
+    //     */
+
+    //     Step(
+    //     function decreaseTags() {
+    //         if (removedTags.length === 0) return 1;
+    //         db.tags.update( { taxonomy : { $in : removedTags} }, { $inc : { count : -1 }}, { multi : true }, this);
+    //     },
+
+    //     function findExistingTags(err) {
+    //         if (err) return next(err);
+    //         if (addedTags.length === 0) return 1;
+    //         db.tags.find( { taxonomy : { $in : addedTags } }, { taxonomy : 1, _id : 0 }, this);
+    //     },
+
+    //     function increaseTags(err, existingTags) {  
+    //         if (existingTags === 1) return 1;
+    //         if (err) return next(err);
+    //         var existingTags = existingTags.map(function (existingTag) {
+    //             return existingTag.taxonomy;
+    //         });
+
+    //         addedTags.forEach(function (addTag) {
+    //             existingTags.indexOf(addTag) === -1 && createdTags.push(addTag)
+    //         })
+
+    //         db.tags.update( { taxonomy : { $in : existingTags} }, { $inc : { count : 1 }}, { multi : true }, this);
+    //     },
+
+    //     function insertTags(err, skip) {
+    //         if (skip === 1) return 1;
+    //         if (err) return next(err);
+    //         var reformed = createdTags.map(function (createdTag) {
+    //             return {
+    //                 taxonomy : createdTag,
+    //                 slug     : createdTag.replace(/\s+|\s+$/g,'-'),
+    //                 count    : 1
+    //             };
+    //         });
+
+    //         console.log('reformed : %s', JSON.stringify(reformed));
+
+    //         if (reformed.length === 0 ) return true;
+    //         db.tags.insert(reformed, this);
+    //     },
+
+    //     function updateTags(err, skip) {
+    //         if (err) return next(err);
+    //         db.posts.update({ _id : id }, { $set: { tags : newTags }}, this)
+    //     },
+
+    //     function complete(err) {
+    //         if (err) return next(err);
+    //         res.json(200);
+    //     }
+    //     )
+
         /*
         console.log('updated. Post: %s', JSON.stringify(post));
         //*/ 
-    });
 };
 
 //Add a Post
