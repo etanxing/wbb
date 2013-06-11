@@ -11,8 +11,8 @@ exports.usercheck = function (req, res, next) {
     if (!req.isAuthenticated()) {
         console.log('user check failed');
         return next(new Error('E0001'));
-    }
-    next()
+    };
+    next();
 };
 
 exports.data = function (req, res, next) {
@@ -88,7 +88,7 @@ exports.updatepost = function (req, res, next) {
     */
     var now = moment(),
         id = new ObjectId(req.body._id),
-        tags = req.body.tags.map(function(tag) { return tag.replace(/^\s+|\s+$/g,''); }).join(','),
+        tags = req.body.tags.map(function(tag) { return tag.replace(/^\s+|\s+$/g,''); }),
         data = req.body;
 
     delete data._id;
@@ -100,6 +100,53 @@ exports.updatepost = function (req, res, next) {
     data.modified_gmt = now.utc().format();
 
     //console.log('data : %s', JSON.stringify(data));
+    Step(
+        function findOldTags() {
+            db.posts.finOne({ _id : id}, { tags : 1, _id : 0 }, this)
+        },
+
+        function decreaseTags(err, post) {
+            if (err) return next(err);
+            if (!post) return next(new Error('Post not found'));
+            if (post.tags.length === 0 ) return true;
+            var oldtags = post.tags.map(function(tag) { return tag.taxonomy; });
+            db.tags.update( { taxonomy : { $in : oldtags} }, { $inc : { count : -1 }}, { multi : true }, this);
+        },
+
+        function increaseTags(err) {
+            if (err && !_.isBoolean_(err)) return next(err);
+            if (tags.length === 0 ) return true;
+            db.tags.findAndModify( { 
+                query  : { taxonomy : { $in : tags } }, 
+                update : { $inc : { count : 1 }},
+                fields : { taxonomy : 1, _id: 0}} ,  this);
+        },
+
+        function  addTags(err, existingTags) {
+            if (err && !_.isBoolean_(err)) return next(err);
+            if (err || existingTags.length === 0) return true;
+            var newTags = tags.map(function(tag) {
+                return existingTags.filter(function(existingTag) {
+                    return existingTag.taxonomy === tag
+                }).length === 0
+            });
+
+            if (newTags.length === 0) return true;
+            newTags = newTags.map(function(tag) {
+                return {
+                    taxonomy : tag,
+                    slug : tag.replace(/\s+|\s+$/g,'-'),
+                    count : 1
+                }
+            });
+
+            db.tags.insert(newTags, this);
+        },
+
+        function updatePost (err) {
+            if (err && !_.isBoolean_(err)) return next(err);
+        }
+        )
 
     db.posts.findAndModify({
         query  : { _id : id }, 
@@ -114,12 +161,12 @@ exports.updatepost = function (req, res, next) {
 
         post.tags.forEach(function (tag) {
             //If tag doesn't exist in new tags, remove it
-            if (newTags.indexOf(tag) === -1) removedTags.push(tag);
+            if (newTags.indexOf(tag.t) === -1) removedTags.push(tag);
         });
 
         newTags.forEach(function (tag) {
-            //if tag doesn;t exist in old tags, add it
-            if (post.tags.indexOf(tag) === -1) addedTags.push(tag);
+            //if tag doesn't exist in old tags, add it
+            if (post.tags.filter(function(oldtag) { return oldtag.t === tag; }).length === 0 ) addedTags.push(tag);
         });
 
         /*
