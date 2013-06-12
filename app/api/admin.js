@@ -56,6 +56,7 @@ exports.posts = function (req, res, next) {
 exports.post = function (req, res, next) {
     db.posts.findOne({ _id : new ObjectId(req.params.id) }, function(err, post) {
         if (err) return next(err);
+        post.tags = _.pluck(post.tags, 'taxonomy');
         res.json(post);
     })
 }
@@ -86,12 +87,11 @@ exports.updatepost = function (req, res, next) {
         3. Store new tags string for later use
         4. Prepare for updated data
     */
-
+    console.log('req.body.tags : %s', req.body.tags);
     var newTags = req.body.tags.map(function(tag) { return tag.replace(/^\s+|\s+$/g,''); }),
         id = new ObjectId(req.body._id),
         postTags = [];
 
-    //console.log('data : %s', JSON.stringify(data));
     Step(
         function findOldTags() {
             console.log('findOldTags');
@@ -102,6 +102,7 @@ exports.updatepost = function (req, res, next) {
             console.log('decreaseTags');
             if (err) return next(err);
             if (!post) return next(new Error('Post not found'));
+            console.log('Post.tags : %s', JSON.stringify(post.tags));
             //If there are no tags with the post, then skip
             if (post.tags.length === 0 ) return true;
             var oldtags = post.tags.map(function(tag) { return tag.taxonomy; });
@@ -113,22 +114,26 @@ exports.updatepost = function (req, res, next) {
             if (err && !_.isBoolean(err)) return next(err);
             //If there are no tags with the post, then skip
             if (newTags.length === 0 ) return true;
-            db.tags.findAndModify( { 
-                query  : { taxonomy : { $in : newTags } }, 
-                update : { $inc : { count : 1 }},
-                fields : { taxonomy : 1, slug: 1, count:1, _id: 0}} ,  this);
+            db.tags.update({ taxonomy : { $in : newTags} }, { $inc : { count : 1 }}, { multi : true }, this);
+        },
+
+        function getExistingTags(err) {
+            if (err && !_.isBoolean(err)) return next(err);
+            if (err) return true;
+            db.tags.find({ taxonomy : { $in : newTags }}, { taxonomy : 1, slug: 1, count:1, _id: 0}, this);
         },
 
         function addTags(err, tags) {
             console.log('addTags');
             if (err && !_.isBoolean(err)) return next(err);
-            if (err || tags.length === 0) return true;
-            var existingTags = tags.map(function(tag) {
+            console.log('tags : %s', JSON.stringify(tags));
+            var existingTags = !tags?[]:tags.map(function(tag) {
                     postTags.push(tag);
                     return tag.taxonomy; 
                 }),
                 addedTags = _.difference(newTags, existingTags);
 
+            console.log('addedTags : %s', addedTags);
             if (addedTags.length === 0) return true;
 
             addedTags = addedTags.map(function(tag) {
@@ -141,13 +146,13 @@ exports.updatepost = function (req, res, next) {
                 postTags.push(_tag);
                 return _tag;
             });
-
             db.tags.insert(addedTags, this);
         },
 
         function updatePost (err) {
             console.log('updatePost');
             if (err && !_.isBoolean(err)) return next(err);
+            console.log('postTags : %s', postTags);
             var now = moment(),                
                 data = _.pick(req.body, 'title', 'slug', 'content', 'status', 'type', 'date', 'password');
 
@@ -155,7 +160,9 @@ exports.updatepost = function (req, res, next) {
             data.date_gmt = moment(data.date, 'DD/MM/YYYY hh:mm A').utc().format('YYYY-MM-DDTHH:mm:ss Z');
             data.modified = now.format();
             data.modified_gmt = now.utc().format();
-            data.tags = postTags;
+            data.tags = postTags.map(function(eachtag) {
+                return { taxonomy : eachtag.taxonomy, slug: eachtag.slug};
+            });
             db.posts.update({ _id : id }, { $set : data}, this);
         },
 
@@ -262,96 +269,102 @@ exports.addpost = function (req, res, next) {
         4. Prepare for updated data
     */
 
-    var addedTags = [],
+    var skip = true,
+        addedTags = req.body.tags.map(function(tag) { return tag.replace(/^\s+|\s+$/g,''); }),
         createdTags = [];
 
     Step(
-    function findUser() {
-        db.users.findOne({ email : 'etanxing@gmail.com'}, this);
-    },
+        function findExistingTags() {
+            if (addedTags.length === 0) return skip;
+            db.tags.find( { taxonomy : { $in : addedTags } }, { taxonomy : 1, _id : 0 }, this);
+        },
 
-    function insertUser(err, user) {
-        if (err) return next(err);
+        function increaseTags(err, tags) {
+            if (err && !_.isBoolean(err)) return next(err);
+            if (err) return skip;
+            var existingtags = !tags?[]:tags.map(function (tag) {
+                createdTags.push({ taxonomy : tag.taxonomy, slug: tag.slug});
+                return tag.taxonomy;
+            });
 
-        if (user) return [user];
+            addedTags.forEach(function (addTag) {
+                existingtags.indexOf(addTag) === -1 && createdTags.push(addTag)
+            })
 
-        var newUser = {
-            _id : '518e16c1c8ed5fb4ae000001',
-            email : 'etanxing@gmail.com',
-            password : '111111',
-            nickname : 'william',
-            status   : 1
-        };
+            db.tags.update( { taxonomy : { $in : existingtags} }, { $inc : { count : 1 }}, { multi : true }, this);
+        },
 
-        db.users.insert(newUser, this);
-    },
+        function insertTags(err, skip) {
+            if (skip === 1) return 1;
+            if (err) return next(err);
+            var reformed = createdTags.map(function (createdTag) {
+                return {
+                    taxonomy : createdTag,
+                    slug     : createdTag.replace(/\s+|\s+$/g,'-'),
+                    count    : 1
+                };
+            });
 
-    function insertBlog(err, users) {
-        if (err) return next(err);
+            console.log('reformed : %s', JSON.stringify(reformed));
 
-        var now = moment(),
-            date = moment(req.body.date, 'DD/MM/YYYY hh:mm A'),
-            newPost = {
-            author : { name: users[0].nickname, _id: users[0]._id },
-            date : date.format('YYYY-MM-DDTHH:mm:ss Z'),
-            modified : now.format(),
-            date_gmt : date.utc().format('YYYY-MM-DDTHH:mm:ss Z'),
-            modified_gmt : now.utc().format(),
-            content : req.body.content,
-            title : req.body.title,
-            status : req.body.status,
-            password : req.body.password,
-            type : req.body.type,
-            tags : req.body.tags.map(function(tag) { return tag.replace(/^\s+|\s+$/g,''); })
-        };
+            if (reformed.length === 0 ) return true;
+            db.tags.insert(reformed, this);
+        },
 
-        newPost.slug = newPost.title.replace(/\s+|:|\+/g,'-');
-        addedTags = newPost.tags;
-        db.posts.insert(newPost, this);
-    },
+        function findUser() {
+            db.users.findOne({ email : 'etanxing@gmail.com'}, this);
+        },
 
-    function findExistingTags(err, posts) {
-        if (err || !posts || posts.length !==1 ) return next(err);
-        var tags = posts[0].tags;
-        if (tags.length === 0) return 1;
-        db.tags.find( { taxonomy : { $in : tags } }, { taxonomy : 1, _id : 0 }, this);
-    },
+        function insertUser(err, user) {
+            if (err) return next(err);
 
-    function increaseTags(err, existingTags) {
-        if (existingTags === 1) return 1;
-        if (err) return next(err);
-        var existingtags = existingTags.map(function (existingTag) {
-            return existingTag.taxonomy;
-        });
+            if (user) return [user];
 
-        addedTags.forEach(function (addTag) {
-            existingtags.indexOf(addTag) === -1 && createdTags.push(addTag)
-        })
-
-        db.tags.update( { taxonomy : { $in : existingtags} }, { $inc : { count : 1 }}, { multi : true }, this);
-    },
-
-    function insertTags(err, skip) {
-        if (skip === 1) return 1;
-        if (err) return next(err);
-        var reformed = createdTags.map(function (createdTag) {
-            return {
-                taxonomy : createdTag,
-                slug     : createdTag.replace(/\s+|\s+$/g,'-'),
-                count    : 1
+            var newUser = {
+                _id : '518e16c1c8ed5fb4ae000001',
+                email : 'etanxing@gmail.com',
+                password : '111111',
+                nickname : 'william',
+                status   : 1
             };
-        });
 
-        console.log('reformed : %s', JSON.stringify(reformed));
+            db.users.insert(newUser, this);
+        },
 
-        if (reformed.length === 0 ) return true;
-        db.tags.insert(reformed, this);
-    },
+        function insertBlog(err, users) {
+            if (err) return next(err);
 
-    function finish (err) {
-        if (err) return next(err);
-        res.json(200);
-    }
+            var now = moment(),
+                date = moment(req.body.date, 'DD/MM/YYYY hh:mm A'),
+                newPost = {
+                author : { name: users[0].nickname, _id: users[0]._id },
+                date : date.format('YYYY-MM-DDTHH:mm:ss Z'),
+                modified : now.format(),
+                date_gmt : date.utc().format('YYYY-MM-DDTHH:mm:ss Z'),
+                modified_gmt : now.utc().format(),
+                content : req.body.content,
+                title : req.body.title,
+                status : req.body.status,
+                password : req.body.password,
+                type : req.body.tags
+            };
+
+            newPost.slug = newPost.title.replace(/\s+|:|\+/g,'-');
+            addedTags = newPost.tags;
+            db.posts.insert(newPost, this);
+        },
+
+        function updateTags (err) {
+            if (err) return next(err);
+
+                //         tags : req.body.tags.map(function(tag) {
+                //     return {
+                //         taxonomy : tag.replace(/^\s+|\s+$/g,''),
+                //         slug : tag..replace(/\s+|\s+$/g,'-')
+                //     }
+                // })
+            res.json(200);
+        }
     )
 }
 
