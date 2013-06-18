@@ -4,7 +4,10 @@ var Step = require('step'),
     config = require('../../config/config').config().db,
     db = mongojs(config.uri, config.collections),
     moment = require('moment'),
-    _ = require('underscore');
+    _ = require('underscore'),
+    hyphenify = function () {
+        return this.replace(/\s+|\s+$/g,'-')
+    };
 
 //Check User
 exports.usercheck = function (req, res, next) {
@@ -88,7 +91,7 @@ exports.updatepost = function (req, res, next) {
         4. Prepare for updated data
     */
     console.log('req.body.tags : %s', req.body.tags);
-    var newTags = req.body.tags.map(function(tag) { return tag.replace(/^\s+|\s+$/g,''); }),
+    var newTags = req.body.tags.map(function(tag) { return tag.trim(); }),
         id = new ObjectId(req.body._id),
         postTags = [];
 
@@ -139,7 +142,7 @@ exports.updatepost = function (req, res, next) {
             addedTags = addedTags.map(function(tag) {
                 var _tag = {
                     taxonomy : tag,
-                    slug : tag.replace(/\s+|\s+$/g,'-'),
+                    slug : hyphenify.call(tag),
                     count : 1
                 };
 
@@ -270,7 +273,7 @@ exports.addpost = function (req, res, next) {
     */
 
     var skip = true,
-        addedTags = req.body.tags.map(function(tag) { return tag.replace(/^\s+|\s+$/g,''); }),
+        addedTags = req.body.tags.map(function(tag) { return tag.trim(); }),
         createdTags = [];
 
     Step(
@@ -300,7 +303,7 @@ exports.addpost = function (req, res, next) {
             var reformed = createdTags.map(function (createdTag) {
                 return {
                     taxonomy : createdTag,
-                    slug     : createdTag.replace(/\s+|\s+$/g,'-'),
+                    slug     : hyphenify.call(createdTag),
                     count    : 1
                 };
             });
@@ -349,7 +352,7 @@ exports.addpost = function (req, res, next) {
                 type : req.body.tags
             };
 
-            newPost.slug = newPost.title.replace(/\s+|:|\+/g,'-');
+            newPost.slug = hyphenify.call(newPost.title);
             addedTags = newPost.tags;
             db.posts.insert(newPost, this);
         },
@@ -359,7 +362,7 @@ exports.addpost = function (req, res, next) {
 
                 //         tags : req.body.tags.map(function(tag) {
                 //     return {
-                //         taxonomy : tag.replace(/^\s+|\s+$/g,''),
+                //         taxonomy : tag.trim(),
                 //         slug : tag..replace(/\s+|\s+$/g,'-')
                 //     }
                 // })
@@ -406,7 +409,7 @@ exports.deleteposts = function(req, res, next) {
 exports.addtags = function (req, res, next) {
     var newtags = req.body.newtags || [];
         addedTags = newtags.map(function (newtag) {
-        return _.isString(newtag)?newtag.replace(/^\s+|\s+$/g,''):''; 
+        return _.isString(newtag)?newtag.trim():''; 
     });
 
     Step(
@@ -427,7 +430,7 @@ exports.addtags = function (req, res, next) {
             addedTags = createdTags.map(function (createdTag) {
                 return {
                     taxonomy : createdTag,
-                    slug     : createdTag.replace(/\s+|\s+$/g,'-'),
+                    slug     : hyphenify.call(createdTag),
                     count    : 1
                 };
             });
