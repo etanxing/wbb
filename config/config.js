@@ -8,6 +8,7 @@ var instance,
             //mongodb://william:xingyupeng@dharma.mongohq.com:10006/bb
             //mongodb://william:xingyupeng@ds053497.mongolab.com:53497/bb
             //mongodb://william:xingyupeng@widmore.mongohq.com:10010/bb_copy
+
             db: {
                 uri : 'mongodb://william:sunshuyu520@dharma.mongohq.com:10006/bb',
                 collections: ['posts', 'users', 'options', 'tags']
