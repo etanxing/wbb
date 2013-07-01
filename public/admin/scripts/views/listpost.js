@@ -2,10 +2,11 @@
 
 define([
     'jquery',
+    'underscore',
     'backbone',
     'text!../templates/listpost.html',
     'moment'
-], function ($, Backbone, listpost, moment) {
+], function ($, _, Backbone, listpost, moment) {
     'use strict';
 
     var PostView = Backbone.View.extend({
