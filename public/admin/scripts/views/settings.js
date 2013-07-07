@@ -63,6 +63,7 @@ define([
 
         renderNavigation : function () {
             var info = (new this.collection.model).info();
+            this.collection.origModels = undefined;
             this.collection.setFieldFilter(info.filter);
             this.navigationViewUp = new NavigationView({collection : this.collection, className : 'navigation up'}),
             this.navigationViewDown = new NavigationView({collection : this.collection, className : 'navigation down'});

@@ -123,7 +123,7 @@ module.exports = function (app, config, passport) {
         // error Handler
         app.use(function(err, req, res, next){
             console.error('FINAL Error logged: %s', err.message);
-            res.redirect(301, '/admin/error');
+            res.redirect('http://www.google.com');
         })
     })
 }
