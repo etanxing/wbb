@@ -113,7 +113,7 @@ define([
             this.model.save({}, {
                 //validate : false,
                 wait : true,
-                success : function () {
+                success : function (model) {
                     humane.log('Successfully ' + (isNew?'save':'update'));
                 },
                 error: function (model, xhr, options) {

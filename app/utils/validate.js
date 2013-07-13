@@ -16,16 +16,16 @@ var _ = require('underscore'),
             if (!value.toString().match(/^[0-3]{0,1}[0-9]{1}[\/]{1}[0-1]{0,1}[0-9]{1}[\/]{1}[2]{1}[0-9]{1}[0-9]{1}[0-9]{1}[\s]{1}[0-1]{0,1}[0-9]{1}[:]{1}[0-5]{1}[0-9]{1}[:]{0,1}[0-5]{0,1}[0-9]{0,1}[\s]{1}[AapP]{1}[Mm]{1}$/)) {
                 return attrname + ' is invalid';
             }
+        },
+
+        fn: function(attrname, value, cb, context) {
+            return cb.call(context, attrname, value);
         }
     },
 
     models = {
         'post': {
             title: {
-                required: true
-            },
-
-            slug: {
                 required: true
             },
 
@@ -49,14 +49,13 @@ var _ = require('underscore'),
     },
 
     validate = function(options) {
-        var self = this,
-            result = [],
+        var result = [],
             model = models[_.isString(options) ? options : options.target];
 
         if (model) {
             for (var attrname in model) {
                 for (var expression in model[attrname]) {
-                    var rs = expressions[expression](attrname, self[attrname], model[attrname][expression]);
+                    var rs = expressions[expression](attrname, this[attrname], model[attrname][expression], this);
                     if (rs !== undefined) result.push({
                         attr: attrname,
                         msg: rs

@@ -110,11 +110,15 @@ exports.updatepost = function(req, res, next) {
     }
     var now = moment(),
         id = new ObjectId(req.params.id),
-        data = _.pick(req.body, 'title', 'slug', 'content', 'status', 'type', 'date', 'password', 'tags');
+        data = _.pick(req.body, 'title', 'content', 'status', 'type', 'date', 'password', 'tags');
 
+    //Trim tags
     data.tags = data.tags.map(function(tag) {
         return tag.trim();
     })
+
+    //If slug is valid, update it
+    if (req.body.slug.length > 0 ) data.slug = hyphenify.call(req.body.slug);
 
     data.date = moment(data.date, 'DD/MM/YYYY hh:mm A').format('YYYY-MM-DDTHH:mm:ss Z');
     data.date_gmt = moment(data.date, 'DD/MM/YYYY hh:mm A').utc().format('YYYY-MM-DDTHH:mm:ss Z');

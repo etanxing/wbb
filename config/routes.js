@@ -33,60 +33,50 @@ module.exports = function (app, passport) {
     //Login
     app.post('/admin', passport.authenticate('local', { successRedirect: '/admin/dashboard', failureRedirect: '/admin/', failureFlash: true }));
 
+    //user check on all admin api
+    app.all('/admin/api/*', admin.usercheck);
+
     //Get Counters
-    app.get('/admin/api/data', admin.usercheck, admin.data);
+    app.get('/admin/api/data', admin.data);
 
     //Get Posts
-    app.get('/admin/api/posts', admin.usercheck, admin.posts);
+    app.get('/admin/api/posts', admin.posts);
 
     //Get a Post
-    app.get('/admin/api/post/:id?', admin.usercheck, admin.post);
+    app.get('/admin/api/post/:id?', admin.post);
 
     //Get Settings
-    app.get('/admin/api/settings', admin.usercheck, admin.settings);
+    app.get('/admin/api/settings', admin.settings);
 
     //Get Tags
-    app.get('/admin/api/tags', admin.usercheck, admin.tags);
+    app.get('/admin/api/tags', admin.tags);
 
     //Update a Post
-    app.put('/admin/api/post/:id', admin.usercheck, admin.updatepost);
+    app.put('/admin/api/post/:id', admin.updatepost);
 
     //Add a Post
-    app.post('/admin/api/post', admin.usercheck, admin.addpost);
+    app.post('/admin/api/post', admin.addpost);
 
     //Delete Posts
-    app.delete('/admin/api/posts', admin.usercheck, admin.deleteposts)
+    app.delete('/admin/api/posts', admin.deleteposts)
 
     //Add tags
-    app.post('/admin/api/tags', admin.usercheck, admin.addtags);
+    app.post('/admin/api/tags', admin.addtags);
 
     //Update a tag
-    app.put('/admin/api/tag/:id', admin.usercheck, admin.updatetag);
+    app.put('/admin/api/tag/:id', admin.updatetag);
 
     //Delete a tag
-    app.delete('/admin/api/tags', admin.usercheck, admin.deletetags);
+    app.delete('/admin/api/tags', admin.deletetags);
 
     //Update a setting
-    app.put('/admin/api/setting/:id', admin.usercheck, admin.updatesetting);
+    app.put('/admin/api/setting/:id', admin.updatesetting);
 
     //Add a setting
-    app.post('/admin/api/setting', admin.usercheck, admin.addsetting);
+    app.post('/admin/api/setting', admin.addsetting);
 
     //Get a setting
-    app.get('/admin/api/setting/:id?', admin.usercheck, admin.setting);
+    app.get('/admin/api/setting/:id?', admin.setting);
 
     /***************** Admin API END  ******************/
-
-
-    /***************** Establish DB API START ******************/
-    var misc = require('../app/api/misc');
-
-    //Import suburbs from Bupa
-    app.get('/api/updatedb', misc.updateDB);
-
-    //Lowercase/Trim fields 
-    app.get('/api/update', misc.updateFields)
-
-
-    /***************** Establish DB API END  ******************/
 }
