@@ -1,3 +1,9 @@
 public/.tmp
 public/admin/
 test/
+.bowerrc
+.editorconfig
+.gitattributes
+.jshintrc
+bower.json
+Gruntfile.js
