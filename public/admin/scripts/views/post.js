@@ -111,25 +111,31 @@ define([
             this.$('.control-group').removeClass('error');
             humane.log((isNew?'Sav':'Updat') + 'ing Post');
             this.model.save({}, {
+                //validate : false,
                 wait : true,
                 success : function () {
                     humane.log('Successfully ' + (isNew?'save':'update'));
                 },
-                error: function () {
-                    humane.log('Failed to ' + (isNew?'save':'update'));
+                error: function (model, xhr, options) {
+                    var errors = JSON.parse(xhr.responseText),
+                        msg = _.map(errors, function (error) {
+                            return error.msg;
+                        })
+
+                    msg.unshift('Failed to ' + (isNew?'save':'update'));
+                    humane.log(msg);
                 }
             })
         },
 
         showErrors : function (model, errors) {
             var self = this,
-                msg = [],
-                errors = _.filter(errors, function(error) { return error.err });
+                msg = [];
 
             _.each(errors, function (error) {
                 self.$('#' + error.attr)
                 .parent('.control-group').addClass('error'); 
-                _.each(error.msg, function(errmsg) { msg.push(errmsg)});
+                msg.push(error.msg);
             })
 
             humane.log(msg);

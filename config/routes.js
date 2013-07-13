@@ -75,12 +75,6 @@ module.exports = function (app, passport) {
     //Get a setting
     app.get('/admin/api/setting/:id?', admin.usercheck, admin.setting);
 
-    //Upload file
-    app.post('/upload', admin.upload);
-
-    //Update database directly
-    app.post('/api/db', admin.updatedb);
-
     /***************** Admin API END  ******************/
 
 
