@@ -78,5 +78,8 @@ module.exports = function (app, passport) {
     //Get a setting
     app.get('/admin/api/setting/:id?', admin.setting);
 
+    //Delete Settings
+    app.delete('/admin/api/settings', admin.deletesettings)
+
     /***************** Admin API END  ******************/
 }

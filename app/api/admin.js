@@ -342,3 +342,19 @@ exports.setting = function(req, res, next) {
         res.json(setting);
     })
 }
+
+exports.deletesettings = function (req, res, next) {
+    var ids = _.clone(req.body.ids || []),
+        objids = _.map(ids, function(id) {
+            return new ObjectId(id);
+        });
+        
+    db.options.remove({
+        _id: {
+            $in: objids
+        }
+    }, function(err) {
+        if (err) return next(err);
+        res.json(ids);
+    });
+}
