@@ -25,10 +25,6 @@ exports.items = function (req, res, next) {
 
 	db.posts.find({status : 1, type : 1 }).skip( (page - 1) * perpage ).limit( perpage ).sort({ date : -1 }, function (err, posts) {
 		if (err) return next(err);
-		posts.forEach(function(post) { 
-			if (post.content.indexOf('<!--more-->') === -1) post.content = post.content.concat('<!--more-->');
-		});
-
 		res.json({ error : null, posts : posts, info : { totalRecords : req.count } });
 	})
 }
