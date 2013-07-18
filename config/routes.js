@@ -15,14 +15,17 @@ module.exports = function (app, passport) {
     /***************** Public API START ******************/ 
     var public = require('../app/api/public');
 
+    //Bootstrap
+    app.get('/api/bootstrap', public.settings, public.itemslug, public.count, public.items, public.end);
+
     //Get Default Settings
-    app.get('/api/settings', public.settings);
+    app.get('/api/settings', public.settings, public.end);
 
     //Get items by suburb and medicaltype
-    app.get('/api/items', public.count, public.items);
+    app.get('/api/items', public.count, public.items, public.end);
 
     //Get suburb name list by start charactors
-    app.get('/api/item/slug/:slug', public.itemslug);
+    app.get('/api/item/slug/:slug', public.itemslug, public.end);
 
     /***************** Public API END   ******************/ 
 

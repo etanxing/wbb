@@ -6,7 +6,8 @@ var config = require('../../config/config').config().db,
 exports.settings = function (req, res, next) {
 	db.options.find({onload : 1}, { name:1, value:1, _id:0 }, function (err, options) {
 		if (err) return next(err);
-		res.json(options);
+		req.data = options;
+		next();
 	})
 }
 
@@ -14,7 +15,7 @@ exports.settings = function (req, res, next) {
 exports.count = function (req, res, next) {
 	db.posts.find({status : 1, type : 1 }).count(function (err, cnt) {
 		if (err) return next(err);
-		req.count = cnt;
+		req.data.count = cnt;
 		next();
 	})
 }
@@ -25,7 +26,8 @@ exports.items = function (req, res, next) {
 
 	db.posts.find({status : 1, type : 1 }).skip( (page - 1) * perpage ).limit( perpage ).sort({ date : -1 }, function (err, posts) {
 		if (err) return next(err);
-		res.json({ error : null, posts : posts, info : { totalRecords : req.count } });
+		req.data.posts = posts;
+		next();
 	})
 }
 
@@ -35,6 +37,13 @@ exports.itemslug = function (req, res, next) {
 		var settings = req.options || {};
 		if (err) return next(err);
 		if (!post) return next(new Error( req.params.slug + ' not found.'))
-		res.json({ error : null, post : post});
+		req.data.post = post;
+		next();
 	})
 };
+
+//Organise data for returning to client side
+exports.end = function (req, res, next) {
+	req.data.error = null;
+	res.json(req.data);
+}
