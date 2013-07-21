@@ -1,6 +1,6 @@
-module.exports = function (app, passport) {
+module.exports = function(app, passport) {
 
-    /***************** ROUTERS START ******************/ 
+    /***************** ROUTERS START ******************/
     var common = require('../app/controllers/common');
 
     //Enable cross-origin access
@@ -10,31 +10,35 @@ module.exports = function (app, passport) {
 
     app.options('*', common.optionsall);
 
-    /***************** ROUTERS END ******************/ 
+    /***************** ROUTERS END ******************/
 
-    /***************** Public API START ******************/ 
+    /***************** Public API START ******************/
     var public = require('../app/api/public');
 
     //Bootstrap
-    app.get('/api/bootstrap', public.settings, public.itemslug, public.count, public.items, public.end);
+    app.get('/api/bootstrap', public.start, public.settings, public.itemslug, public.count, public.items, public.end);
 
     //Get Default Settings
-    app.get('/api/settings', public.settings, public.end);
+    app.get('/api/settings', public.start, public.settings, public.end);
 
     //Get items by suburb and medicaltype
-    app.get('/api/items', public.count, public.items, public.end);
+    app.get('/api/items', public.start, public.count, public.items, public.end);
 
     //Get suburb name list by start charactors
-    app.get('/api/item/slug/:slug', public.itemslug, public.end);
+    app.get('/api/item/slug/:slug', public.start, public.itemslug, public.end);
 
-    /***************** Public API END   ******************/ 
+    /***************** Public API END   ******************/
 
 
     /***************** Admin API START ******************/
     var admin = require('../app/api/admin');
 
     //Login
-    app.post('/admin', passport.authenticate('local', { successRedirect: '/admin/dashboard', failureRedirect: '/admin/', failureFlash: true }));
+    app.post('/admin', passport.authenticate('local', {
+        successRedirect: '/admin/dashboard',
+        failureRedirect: '/admin/',
+        failureFlash: true
+    }));
 
     //user check on all admin api
     app.all('/admin/api/*', admin.usercheck);
