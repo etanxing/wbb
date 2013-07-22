@@ -4,8 +4,9 @@ define([
     'underscore',
     'backbone',
     '../common',
+    '../utils/validate',
     'moment'
-], function (_, Backbone, Common, moment) {
+], function (_, Backbone, Common, Validate, moment) {
     'use strict';
 
     var Post = Backbone.Model.extend({
@@ -40,84 +41,13 @@ define([
             return info;
         },
 
-        validations : {
-            title   : {
-                required : true
-            },
-
-            slug    : {
-                required : true
-            },
-
-            content : {
-                required : true
-            },
-
-            status  : {
-                range    : [1, 3]
-            },
-
-            type: {
-                range    : [1, 2]
-            },
-
-            date : {
-                required : true,
-                datetime : true
-            }
-        },
-
-        validationExpressions : {
-            required : function(attrname, value) {
-                if (_.isNull(value) || _.isUndefined(value) || (_.isString(value) && value.replace(/^\s+|\s+$/g,"") === '')) {
-                    return attrname + ' is required';
-                } 
-
-                return true;     
-            },
-
-            range : function(attrname, value, expectation) {
-                if (!_.isNumber(value) || value < expectation[0] || value > expectation[1]) {
-                    return attrname + ' must be between ' + expectation[0] +' and ' + expectation[1];
-                }
-
-                return true;
-            },
-
-            datetime : function(attrname, value) {
-                if (!value.toString().match(/^[0-3]{0,1}[0-9]{1}[\/]{1}[0-1]{0,1}[0-9]{1}[\/]{1}[2]{1}[0-9]{1}[0-9]{1}[0-9]{1}[\s]{1}[0-1]{0,1}[0-9]{1}[:]{1}[0-5]{1}[0-9]{1}[:]{0,1}[0-5]{0,1}[0-9]{0,1}[\s]{1}[AapP]{1}[Mm]{1}$/)) {
-                    return attrname + ' is invalid';
-                }
-
-                return true;
-            }
-        },
-
         initialize : function (){
-            _.bindAll(this, 'validateAttr');
+
         },
 
         validate : function () {
-            var attrValidations = _.pairs(this.validations),
-                results = attrValidations.map(this.validateAttr),
-                errors = results.filter(function (result){ return result.err;})
-
+            var errors = Validate.validate.call(this.toJSON(), 'post');
             if (errors.length > 0) return errors;
-        },
-
-        validateAttr : function(attrValidation) {
-            var self = this,
-                attrname = attrValidation[0],
-                validations = _.pairs(attrValidation[1]),
-                results = (validations.map(function (validation){
-                    return self.validationExpressions[validation[0]](attrname, self.get(attrname), validation[1]);
-                })).filter(function (result){ return _.isString(result);});
-
-            return {
-                msg : results,
-                err : results.length > 0,
-                attr: attrname
-            };
         },
 
         urlRoot : function() {

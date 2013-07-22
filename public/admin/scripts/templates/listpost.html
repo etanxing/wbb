@@ -12,7 +12,7 @@
 	</nav>
 </td>
 <td class="col name"><%=post.author.name %></td>
-<td class="col tags"><%=_.pluck(post.tags, 'taxonomy').join(', ') %></td>
+<td class="col tags"><%=post.tags.join(', ') %></td>
 <td class="col date"><%=moment(post.date, 'YYYY-MM-DDTHH:mm:ss Z').format('DD/MM/YYYY hh:mm A') %></td>
 <td class="col status"><%=status[post.status][0]%></td>
 <td class="col type"><%=type[post.type][0]%></td>
