@@ -1,6 +1,7 @@
 node_modules
 public/.tmp
-public/admin/
+public/dist
+public/admin/bower_components
 lib-cov
 *.seed
 *.log
@@ -9,7 +10,6 @@ lib-cov
 *.out
 *.pid
 *.gz
-Procfile
 
 pids
 logs
