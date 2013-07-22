@@ -27,9 +27,9 @@ module.exports = function (app, config, passport) {
     app.use(express.bodyParser({ keepExtensions: true, uploadDir: './upload' }))
     app.use(express.methodOverride())
 
-    app.use('/admin/setting', express.static(config.root + '/public/admin'));
-    app.use('/admin/post', express.static(config.root + '/public/admin'));
-    app.use('/admin', express.static(config.root + '/public/admin'));
+    app.use('/admin/setting', express.static(config.root + '/public/dist'));
+    app.use('/admin/post', express.static(config.root + '/public/dist'));
+    app.use('/admin', express.static(config.root + '/public/dist'));
 
     // set views path, template engine and default layout
     app.engine('us', function(path, options, fn){
@@ -44,7 +44,7 @@ module.exports = function (app, config, passport) {
         });
     })
 
-    app.set('views', config.root + '/public/admin')
+    app.set('views', config.root + '/public/dist')
     app.set('view engine', 'us')
 
     // production only
