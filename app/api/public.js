@@ -4,6 +4,10 @@ var config = require('../../config/config').config().db,
 
 //Get Settings
 exports.settings = function(req, res, next) {
+	var query = req.query.q;	
+	req.query.$page = (/^p\/\d+$/i).test(query)?query.slice(2): undefined;
+	!req.query.$page && (req.query.slug = query);
+
     db.options.find({
         onload: 1
     }, {
@@ -34,8 +38,8 @@ exports.count = function(req, res, next) {
 }
 
 exports.items = function(req, res, next) {
-    var perpage = parseInt(req.query.$perpage),
-        page = parseInt(req.query.$page || 1);
+    var perpage = parseInt(req.query.$perpage, 10),
+        page = parseInt(req.query.$page || 1, 10);
 
     if (req.data.count) {
         db.posts.find({
@@ -46,6 +50,8 @@ exports.items = function(req, res, next) {
         }, function(err, posts) {
             if (err) return next(err);
             req.data.posts = posts;
+            req.data.perpage = perpage;
+            req.data.page = page;
             next();
         })
     } else {
@@ -54,8 +60,8 @@ exports.items = function(req, res, next) {
 }
 
 //Get suburb name list by start charactors
-exports.itemslug = function(req, res, next) {
-    var slug = req.query.slug || req.params.slug;
+exports.itemslug = function(req, res, next) {    
+	var slug = req.params.slug || req.query.slug;
     if (slug) {
         db.posts.findOne({
             slug: slug
