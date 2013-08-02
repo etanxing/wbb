@@ -93,6 +93,7 @@ define([
         },
 
         page404: function() {
+            this.navigate('admin', {trigger: true, replace: false});
             console.log('r u lost?');
         },
 
@@ -109,7 +110,7 @@ define([
 
                 this.view.render(arrys);
             } else {
-                this.navigate('admin/', true);
+                this.navigate('admin', true);
             }
         }
     });
