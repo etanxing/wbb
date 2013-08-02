@@ -8,6 +8,8 @@ module.exports = function(app, passport) {
 
     app.get('*', common.getall);
 
+    app.get('/', common.index);
+
     app.options('*', common.optionsall);
 
     /***************** ROUTERS END ******************/

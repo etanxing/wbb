@@ -54,7 +54,7 @@ define([
 
         // Hash maps for routes
         routes : {
-            'admin/'          : 'index',
+            'admin'          : 'index',
             'admin/dashboard' : 'dashboard',
             'admin/posts'     : 'posts',
             'admin/post(/:id)': 'post', 

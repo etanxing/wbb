@@ -34,7 +34,10 @@
             g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
             s.parentNode.insertBefore(g,s)}(document,'script'));
         </script>
-        <script type="text/javascript">var user = user || { <% print(userid?'id : \'' + userid + '\'':'');%>}</script>
+        <script type="text/javascript">
+            var user = user || { <% print(userid?'id : \'' + userid + '\'':'');%>}
+              , path = path || '<%=path%>';
+        </script>
         <!-- build:js scripts/main.js -->        
         <script data-main="scripts/main" src="bower_components/requirejs/require.js"></script>
         <!-- endbuild -->

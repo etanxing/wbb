@@ -46,7 +46,8 @@ require([
     'backbone',
     'routes/router'
 ], function (Backbone, Router) {
-    new Router;
+    var router = new Router;
     Backbone.history.start({pushState: true});
+    router.navigate(path, {trigger: true, replace: false});
     console.log('arrived.');
 });
