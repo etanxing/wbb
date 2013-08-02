@@ -26,14 +26,7 @@ module.exports = function (app, config, passport) {
     // bodyParser should be above methodOverride
     app.use(express.bodyParser({ keepExtensions: true, uploadDir: './upload' }))
     app.use(express.methodOverride())
-
-<<<<<<< HEAD
     app.use(express.static(config.root + '/public/admin'));
-=======
-    app.use('/admin/setting', express.static(config.root + '/public/dist'));
-    app.use('/admin/post', express.static(config.root + '/public/dist'));
-    app.use('/admin', express.static(config.root + '/public/dist'));
->>>>>>> 8aba0cda8449dda4943ef651077cdc685a82dc0c
 
     // set views path, template engine and default layout
     app.engine('us', function(path, options, fn){
